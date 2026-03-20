@@ -17,6 +17,7 @@ import java.sql.SQLException;
 public class DataService {
     private final DataSource dataSourceProduct;
     private final DataSource dataSourceMedia;
+    private final DataSource dataSourceStock;
     private SQLExecuteScript sqlExecuteScript = new SQLExecuteScript();
 
     @Value( "${app.sql.product}")
@@ -25,18 +26,25 @@ public class DataService {
     @Value( "${app.sql.media}")
     private String mediaScripts;
 
+    @Value( "${app.sql.stock}")
+    private String stockScripts;
+
     @Autowired
     public DataService(@Qualifier("dataSourceProduct") DataSource dataSourceProduct,
-                       @Qualifier("dataSourceMedia") DataSource dataSourceMedia) {
+                       @Qualifier("dataSourceMedia") DataSource dataSourceMedia,
+                       @Qualifier("dataSourceStock") DataSource dataSourceStock
+    ) {
         this.dataSourceProduct = dataSourceProduct;
         this.dataSourceMedia = dataSourceMedia;
+        this.dataSourceStock = dataSourceStock;
         this.sqlExecuteScript = sqlExecuteScript;
     }
 
     public SampleDataVm createData() throws SQLException, IOException {
-        /*How to get path local and not don't get in file JAR with ENV DEV*/
         sqlExecuteScript.executeScriptForSchema(dataSourceProduct, "public", productScripts);
         sqlExecuteScript.executeScriptForSchema(dataSourceMedia, "public", mediaScripts);
+        sqlExecuteScript.executeScriptForSchema(dataSourceStock, "public", stockScripts);
         return new SampleDataVm("Insert Sample Data successfully!", true);
+
     }
 }

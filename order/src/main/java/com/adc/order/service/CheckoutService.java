@@ -56,12 +56,12 @@ public class CheckoutService {
     }
 
     private void prepareCheckoutItems(Checkout checkout, CheckoutPostVm checkoutPostVm) {
-        Set<Long> productIds = checkoutPostVm.checkOutItemPostVms()
+        Set<Long> productIds = checkoutPostVm.checkoutItemVms()
                 .stream()
                 .map(CheckOutItemPostVm::productId)
                 .collect(Collectors.toSet());
 
-        List<CheckoutItem> checkoutItems = checkoutPostVm.checkOutItemPostVms()
+        List<CheckoutItem> checkoutItems = checkoutPostVm.checkoutItemVms()
                 .stream()
                 .map(checkoutMapper::toModel)
                 .map(item -> {
@@ -80,7 +80,6 @@ public class CheckoutService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         checkout.setCheckoutItems(enrichedItems);
         checkout.setTotalAmount(totalAmount);
-
     }
 
     private List<CheckoutItem> enrichCheckoutItemWithProductDetails(Map<Long, ProductCheckoutListVm> products,
@@ -95,7 +94,6 @@ public class CheckoutService {
                     .productPrice(BigDecimal.valueOf(product.getPrice()))
                     .build();
         }).toList();
-
     }
 
     public void updateCheckoutPaymentMethod(String id, @Valid CheckoutPaymentMethodPutVm checkoutPaymentMethodPutVm) {
@@ -107,7 +105,6 @@ public class CheckoutService {
                 checkout.getPaymentMethodId()
         );
         checkoutRepository.save(checkout);
-
     }
 
     public CheckoutVm getCheckoutWithPendingStateById(String id) {

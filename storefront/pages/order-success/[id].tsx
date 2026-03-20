@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import React, { useEffect, useState, useMemo } from 'react';
 import { ProductThumbnail } from '@/modules/homepage/models/ProductThumbnail';
+import { useCartContext } from '@/context/CartContext';
 
 const formatCurrency = (amount?: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
@@ -17,6 +18,7 @@ const OrderSuccessPage = () => {
     const [order, setOrder] = useState<OrderVm | undefined>();
     const [products, setProducts] = useState<ProductThumbnail[]>([]);
     const [loading, setLoading] = useState(true);
+    const { fetchNumberCartItems } = useCartContext();
 
     useEffect(() => {
         if (id) {
@@ -28,12 +30,16 @@ const OrderSuccessPage = () => {
                         const productIds = Array.from(res.orderItemVms).map((item: { productId: number }) => item.productId);
                         return getProductById(productIds);
                     }
+                    return Promise.resolve([] as ProductThumbnail[]);
                 })
                 .then((resProducts) => setProducts(resProducts || []))
                 .catch((error) => console.error(error))
-                .finally(() => setLoading(false));
+                .finally(async () => {
+                    await fetchNumberCartItems();
+                    setLoading(false);
+                });
         }
-    }, [id]);
+    }, [id, fetchNumberCartItems]);
 
     const orderItems = useMemo(() => {
         return Array.from(order?.orderItemVms || []).map((item) => {
@@ -52,7 +58,6 @@ const OrderSuccessPage = () => {
     return (
         <div className="bg-gray-50 min-h-screen py-10">
             <div className="container mx-auto px-4 max-w-5xl">
-                {/* Header Section */}
                 <div className="text-center mb-10">
                     <div className="flex justify-center mb-4">
                         <div className="bg-green-100 p-4 rounded-full">
@@ -120,7 +125,7 @@ const OrderSuccessPage = () => {
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Tạm tính</span>
-                                    <span>{formatCurrency(Array.from(order.orderItemVms).reduce((total, item) => total + (item.productPrice * item.quantity), 0))}</span>
+                                    <span>{formatCurrency(Array.from(order.orderItemVms).reduce((total, item) => total + (item.productPrice && item.quantity ? item.productPrice * item.quantity : 0), 0))}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Phí vận chuyển</span>
@@ -128,7 +133,7 @@ const OrderSuccessPage = () => {
                                 </div>
                                 <div className="border-t pt-3 flex justify-between text-lg font-bold text-red-600">
                                     <span>Tổng cộng</span>
-                                    <span>{formatCurrency(Array.from(order.orderItemVms).reduce((total, item) => total + (item.productPrice * item.quantity), 0))}</span>
+                                    <span>{formatCurrency(Array.from(order.orderItemVms).reduce((total, item) => total + (item.productPrice && item.quantity ? item.productPrice * item.quantity : 0), 0))}</span>
                                 </div>
                             </div>
 

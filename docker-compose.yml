@@ -132,6 +132,8 @@ services:
         - adc-network
   storefront-nextjs:
       container_name: storefront-nextjs
+      extra_hosts:
+        - "storefront.local:host-gateway"
       build:
           context: ./storefront
           dockerfile: Dockerfile

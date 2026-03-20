@@ -13,35 +13,28 @@ import { useUserInfoContext } from '@/context/UserInforProvider';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Checkout } from '@/modules/checkout/model/Checkout';
+import { CheckoutType } from '@/modules/checkout/model/enum/CheckoutType';
+import { useCart } from '@/modules/cart/hooks/useCart';
 
 type ProductDetailProps = {
     product: ProductDetail;
 }
 
 export default function ProductDetails({ product }: ProductDetailProps) {
-    const { fetchNumberCartItems } = useCartContext();
-    const { email } = useUserInfoContext();
     const [quantity, setQuantity] = useState<number>(1);
-    const [showNotification, setShowNotification] = useState<boolean>(false);
+    const { addProductToCart, isAdding, error } = useCart();
     const router = useRouter();
 
     const handleQuantityChange = (q: number) => setQuantity(q);
 
-    const onClickHandleAddToCart = async () => {
-        if (quantity < 1) return;
-        try {
-            await addToCartItem({ productId: product.id, quantity });
-            fetchNumberCartItems();
-            setShowNotification(true);
-            setTimeout(() => setShowNotification(false), 3000);
-        } catch (error) {
-            console.error("Add to cart failed", error);
-        }
-    }
-
     const onClickHandleSubmit = async () => {
         if (quantity < 1) return;
-        const checkoutPayload : Checkout = {
+
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem("checkoutType", CheckoutType.DIRECT);
+        }
+
+        const checkoutPayload: Checkout = {
             email: email,
             note: '',
             promotionCode: "",
@@ -56,7 +49,9 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         }
         try {
             const res = await createCheckout(checkoutPayload);
-            router.push(`/checkouts/${res?.id}`);
+            if (res) {
+                router.push(`/checkouts/${res?.id}`);
+            }
         } catch (error) {
             alert("Vui lòng đăng nhập để tiếp tục");
         }
@@ -65,12 +60,12 @@ export default function ProductDetails({ product }: ProductDetailProps) {
     return (
         <div className="bg-white min-h-screen">
 
-            {showNotification && (
+            {isAdding && (
                 <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm">
                     <div className="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center justify-between mx-4 animate-in fade-in slide-in-from-top-4">
                         <div className="flex items-center gap-3">
                             <span className="bg-emerald-500 rounded-full p-1">
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                             </span>
                             <span className="text-sm font-medium">Đã thêm vào giỏ hàng!</span>
                         </div>
@@ -90,10 +85,10 @@ export default function ProductDetails({ product }: ProductDetailProps) {
                     <div className="space-y-4">
                         <div className="aspect-square overflow-hidden rounded-2xl bg-slate-100 border border-slate-100">
                             {product.thumbnailMediaUrl && (
-                                <ImageWithFallBack 
-                                    src={product.thumbnailMediaUrl} 
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
-                                    alt={product.name} 
+                                <ImageWithFallBack
+                                    src={product.thumbnailMediaUrl}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                    alt={product.name}
                                 />
                             )}
                         </div>
@@ -103,12 +98,12 @@ export default function ProductDetails({ product }: ProductDetailProps) {
                     <div className="lg:sticky lg:top-8 h-fit space-y-8">
                         <div className="bg-white p-2">
                             <ProductInfo product={product} handleQuantityChange={handleQuantityChange} />
-                            
+
                             <div className="mt-8 pt-8 border-t border-slate-100">
-                                <ProductActions 
-                                    product={product} 
-                                    handleAddToCart={onClickHandleAddToCart} 
-                                    handleSubmitBuyNow={onClickHandleSubmit} 
+                                <ProductActions
+                                    product={product}
+                                    handleAddToCart={onClickHandleAddToCart}
+                                    handleSubmitBuyNow={onClickHandleSubmit}
                                 />
                             </div>
                         </div>

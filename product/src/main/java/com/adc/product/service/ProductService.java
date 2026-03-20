@@ -28,7 +28,6 @@ public class ProductService {
     public PaginatedItems<Book> getBooks(int pageIndex, int pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<Book> bookPage = bookRepository.findAll(pageable);
-
         return new PaginatedItems<>(pageIndex, pageSize, bookPage.getTotalElements(), bookPage.getContent());
 
     }
@@ -66,7 +65,7 @@ public class ProductService {
 
         List<ProductCheckoutListVm> productCheckoutListVms = productPage.getContent()
                 .stream().map(product -> {
-                    if(product.getBrand() == null) {
+                    if (product.getBrand() == null) {
                         product.setBrand(new Brand());
                     }
                     ProductCheckoutListVm productCheckoutListVm = ProductCheckoutListVm.fromModel(product);
@@ -129,10 +128,10 @@ public class ProductService {
             }
         }
 
-        if(product.getBrand() == null) {
+        if (product.getBrand() == null) {
             product.setBrand(new Brand());
         }
-        if(product.getBookCate() == null) {
+        if (product.getBookCate() == null) {
             product.setBookCate(new ArrayList<>());
         }
         return new ProductDetailGetVm(

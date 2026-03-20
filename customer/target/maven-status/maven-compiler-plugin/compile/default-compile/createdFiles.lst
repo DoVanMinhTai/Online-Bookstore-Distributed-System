@@ -5,6 +5,7 @@ com/example/customer/config/KeyCloakPropsConfig.class
 com/example/customer/respository/UserAddressRespository.class
 com/example/customer/viewmodel/useraddress/UserAddressVm.class
 com/example/customer/config/KeyCloakClientConfig.class
+com/example/customer/model/enumeration/AddressType.class
 com/example/customer/model/UserAddress$UserAddressBuilder.class
 com/example/customer/viewmodel/customer/CustomerAdminVm.class
 com/example/customer/model/UserAddress.class
@@ -18,6 +19,8 @@ com/example/customer/viewmodel/address/AddressVm$AddressVmBuilder.class
 com/example/customer/config/ServiceUrlConfig.class
 com/example/customer/utils/Constants.class
 com/example/customer/service/LocationService.class
+com/example/customer/viewmodel/address/UserAddressPostVm.class
+com/example/customer/viewmodel/customer/UserInfoGetVm.class
 com/example/customer/controller/UserAddressController.class
 com/example/customer/config/SecurityConfig.class
 com/example/customer/config/RestClientConfig.class
@@ -27,7 +30,6 @@ com/example/customer/viewmodel/customer/CustomerProfileRequestVm.class
 com/example/customer/viewmodel/address/AddressDetailVm.class
 com/example/customer/viewmodel/useraddress/UserAddressVm$UserAddressVmBuilder.class
 com/example/customer/config/KeyCloakPropsConfig$Credentials.class
-com/example/customer/viewmodel/address/AddressPostVm.class
 com/example/customer/viewmodel/customer/CustomerPostVm.class
 com/example/customer/viewmodel/ErrorVm.class
 com/example/customer/model/AbstractAuditEntity.class

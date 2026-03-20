@@ -10,6 +10,7 @@ import { CartItem, calculateTotalPrice } from '@/modules/cart/components/CartIte
 import { Checkout } from '@/modules/checkout/model/Checkout';
 import { useUserInfoContext } from '@/context/UserInforProvider';
 import { createCheckout } from '@/modules/checkout/service/CheckoutService';
+import { CheckoutType } from '@/modules/checkout/model/enum/CheckoutType';
 
 const Index = () => {
   const [cartItems, setCartItem] = useState<CartItemGetDetailVms[]>([]);
@@ -105,8 +106,13 @@ const Index = () => {
 
   const handleCheckout = async () => {
     const selectedItems = cartItems.filter(item => selectedCartItem.has(item.productId));
+    
     if (selectedItems.length === 0) return alert("Vui lòng chọn sản phẩm!");
-
+    
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem("checkoutType", CheckoutType.CART);
+    }
+    
     const checkoutData: Checkout = {
       email,
       note: '',
@@ -120,7 +126,12 @@ const Index = () => {
 
     try {
       const res = await createCheckout(checkoutData);
-      router.push(`/checkouts/${res?.id}`);
+      if (res?.id) {
+        console.log("[Checkout] Success! Order ID:", res.id);
+        router.push(`/checkouts/${res.id}`);
+      } else {
+        throw new Error("Server returned success but no ID found");
+      }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'status' in error) {
         const err = error as { status: number };

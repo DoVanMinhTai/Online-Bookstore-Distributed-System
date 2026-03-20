@@ -7,17 +7,20 @@ import com.adc.order.viewmodel.checkout.CheckoutStatusPutVm;
 import com.adc.order.viewmodel.checkout.CheckoutVm;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class CheckoutController {
     private final CheckoutService checkoutService;
 
     @PostMapping("/storefront/checkouts")
     public ResponseEntity<CheckoutVm> checkout(@Valid @RequestBody CheckoutPostVm checkoutPostVm) {
         System.out.println("received checkout post vm: " + checkoutPostVm);
+        log.info("Received CheckoutPostVm" + checkoutPostVm);
         return ResponseEntity.ok(checkoutService.createCheckout(checkoutPostVm));
     }
 

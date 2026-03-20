@@ -20,6 +20,9 @@ public class DataSourceConfig {
     @Value("${spring.datasource.media.url}")
     String urlMedia;
 
+    @Value("${spring.datasource.stock.url}")
+    String urlStock;
+
     @Value("${spring.datasource.username}")
     String username;
 
@@ -32,22 +35,17 @@ public class DataSourceConfig {
     @Bean(name = "dataSourceProduct")
     @Primary
     public DataSource dataSourceProduct() {
-        return DataSourceBuilder.create()
-                .driverClassName(driverClassName)
-                .url(urlBook)
-                .username(username)
-                .password(password)
-                .build();
+        return DataSourceBuilder.create().driverClassName(driverClassName).url(urlBook).username(username).password(password).build();
     }
 
     @Bean(name = "dataSourceMedia")
     public DataSource dataSourceMedia() {
-        return DataSourceBuilder.create()
-                .driverClassName(driverClassName)
-                .url(urlMedia)
-                .username(username)
-                .password(password)
-                .build();
+        return DataSourceBuilder.create().driverClassName(driverClassName).url(urlMedia).username(username).password(password).build();
+    }
+
+    @Bean(name = "dataSourceStock")
+    public DataSource dataSourceStock() {
+        return DataSourceBuilder.create().driverClassName(driverClassName).url(urlStock).username(username).password(password).build();
     }
 
     @Bean(name = "jdbcProduct")
@@ -59,5 +57,10 @@ public class DataSourceConfig {
     @Bean(name = "jdbcMedia")
     public JdbcTemplate jdbcTemplateMedia(DataSource dataSourceMedia) {
         return new JdbcTemplate(dataSourceMedia);
+    }
+
+    @Bean(name = "jdbcStock")
+    public JdbcTemplate jdbcTemplateStock(DataSource dataSourceStock) {
+        return new JdbcTemplate(dataSourceStock);
     }
 }

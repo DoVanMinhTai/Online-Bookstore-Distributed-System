@@ -11,6 +11,7 @@
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/listener/CustomerAuditingEntityListener.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/model/AbstractAuditEntity.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/model/UserAddress.java
+/mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/model/enumeration/AddressType.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/respository/UserAddressRespository.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/service/CustomerService.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/service/LocationService.java
@@ -18,11 +19,12 @@
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/utils/Constants.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/ErrorVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/address/AddressDetailVm.java
-/mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/address/AddressPostVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/address/AddressVm.java
+/mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/address/UserAddressPostVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/customer/CustomerAdminVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/customer/CustomerList.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/customer/CustomerPostVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/customer/CustomerProfileRequestVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/customer/CustomerVm.java
+/mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/customer/UserInfoGetVm.java
 /mnt/f/project_SW/Bookstore-Microservices-Project/customer/src/main/java/com/example/customer/viewmodel/useraddress/UserAddressVm.java

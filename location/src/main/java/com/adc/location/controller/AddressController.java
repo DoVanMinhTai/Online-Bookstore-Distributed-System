@@ -35,15 +35,14 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getAddressList(ids));
     }
 
-    @DeleteMapping("/storefront/addresses/{id}")
-    public ResponseEntity<Void> deleteAddress(@PathVariable Long id) {
-        addressService.deleteAddress(id);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/storefront/addresses/billingAddresses")
     public ResponseEntity<List<AddressDetailVm>> getBillingAddressById(@RequestParam List<Long> ids) {
         return ResponseEntity.ok(addressService.getListBillingAddressByIds(ids));
     }
 
+    @DeleteMapping("/storefront/addresses/{id}")
+    public ResponseEntity<Void> deleteAddress(@PathVariable Long id) {
+        addressService.deleteAddress(id);
+        return ResponseEntity.ok().build();
+    }
 }

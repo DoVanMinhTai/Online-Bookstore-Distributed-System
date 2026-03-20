@@ -1,27 +1,27 @@
 import { getNumberCartItem } from '@/modules/cart/services/CartServices';
-import { error } from 'console';
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { createContext, useContext, useState } from 'react'
 
 export const CartContext = createContext({
     numberCartItems: 0,
-    fetchNumberCartItems: () => { }
+    fetchNumberCartItems: async () => { }
 });
 
 export function CartProvider({ children }: React.PropsWithChildren) {
     const [numberCartItems, setNumberCartItem] = useState(0);
 
-
-
-    const fetchNumberCartItems = useCallback(() => {
-        getNumberCartItem()
-            .then((res) => setNumberCartItem(res))
-            .catch((error) => console.error(error))
+    const fetchNumberCartItems = useCallback(async () => {
+        try {
+            const res = await getNumberCartItem();
+            setNumberCartItem(res);
+        } catch (error) {
+            console.error(error);
+        }
     }, []);
 
     useEffect(() => {
-        fetchNumberCartItems()
-    }, []);
+        fetchNumberCartItems();
+    }, [fetchNumberCartItems]);
 
     const state = useMemo(() => ({
         numberCartItems,

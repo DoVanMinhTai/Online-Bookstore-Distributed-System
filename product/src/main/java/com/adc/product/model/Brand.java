@@ -19,7 +19,9 @@ public class Brand  extends AbstractAuditEntity{
     private Long id;
 
     private String name;
+
     private String slug;
+
     private boolean isPublished;
 
     @OneToMany(mappedBy = "brand")

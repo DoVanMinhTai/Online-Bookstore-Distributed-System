@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { deleteCartItemByProductId } from '@/modules/cart/services/CartServices';
 import { getProductById } from '@/modules/catalog/services/ProductServices';
 import { ProductThumbnail } from '@/modules/homepage/models/ProductThumbnail';
 import { AddressDetailVm } from '@/modules/address/model/AddressDetail';
-import { createOrder } from '@/modules/orders/services/OrdersService';
 import { OrdersPostVm } from '@/modules/orders/model/OrdersPostVm';
 import { Checkout } from '@/modules/checkout/model/Checkout'
 import { getCheckoutById } from '@/modules/checkout/service/CheckoutService';
@@ -15,6 +13,8 @@ import CheckoutComponents from '@/modules/checkout/components/CheckoutProductLis
 import { PaymentMethod } from '@/modules/orders/model/enum/PaymentMethod';
 import { DeliveryMethod } from '@/modules/orders/model/enum/DeliveryMethod';
 import { PaymentStatus } from '@/modules/orders/model/enum/PaymentStatus';
+import { useCartContext } from '@/context/CartContext';
+import { useCheckout } from '@/hooks/useCheckout';
 
 interface CheckoutFormData {
     paymentMethod?: PaymentMethod;
@@ -31,6 +31,8 @@ const CheckoutPage = () => {
     const [modalPaymentMethod, setModalPaymentMethod] = useState<boolean>(false);
     const { register, setValue } = useForm<CheckoutFormData>();
     const [checkoutFormData, setCheckoutFormData] = useState<CheckoutFormData>();
+    const { fetchNumberCartItems } = useCartContext();
+    const { processOrder } = useCheckout(fetchNumberCartItems);
 
     useEffect(() => {
         if (id) {
@@ -57,7 +59,6 @@ const CheckoutPage = () => {
         const productDetail = async () => {
             if (checkout) {
                 const checkoutitemProduct = checkout.checkoutItemVms ? Array.from(checkout.checkoutItemVms) : [];
-                console.log(checkout);
                 const productIds = checkoutitemProduct.map((item) => item.productId);
 
                 await getProductById(productIds)
@@ -122,20 +123,23 @@ const CheckoutPage = () => {
             )
         }
 
-        const reponse = await createOrder(ordersPostVm);
-        if (reponse.data.orderItemVms) {
-            Array.from(reponse.data.orderItemVms).map((item) => item.productId)
-                .forEach(deleteCartItemByProductId)
+        try {
+            const order = await processOrder(ordersPostVm);
+            if (order) {
+                const orderId = order.id;
+                router.push(`/order-success/${orderId}`)
+            } else {
+                console.error("Failed to create order");
+            }
         }
-        if (reponse.status === 200) {
-            const orderId = reponse.data.id;
-            router.push(`/order-success/${orderId}`)
+        catch (error) {
+            console.error("Error creating order:", error);
         }
     }
 
     return (
         <>
-            <div className="grid grid-cols-2 gap-10      container mx-auto">
+            <div className="grid grid-cols-2 gap-10 container mx-auto">
                 <CheckoutShippingInfo checkout={checkout ?? { email: '', checkoutItemVms: [] }} handleAddress={handleAddress} />
                 <CheckoutComponents products={product} checkoutItems={checkout?.checkoutItemVms ?? []} />
 

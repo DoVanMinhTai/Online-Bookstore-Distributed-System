@@ -12,6 +12,6 @@ public record CheckoutPostVm(
         String paymentMethodId,
         Long shippingAddressId,
         @NotEmpty(message = "Checkout item must not be empty")
-        List<CheckOutItemPostVm> checkOutItemPostVms
+        List<CheckOutItemPostVm> checkoutItemVms
 ) {
 }

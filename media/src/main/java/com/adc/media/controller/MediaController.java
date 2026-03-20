@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RestController
-@CrossOrigin(origins = "*",maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequiredArgsConstructor
 public class MediaController {
     private final MediaService mediaService;
 
     @GetMapping("/media/{id}")
     public ResponseEntity<MediaVm> getMediaById(@PathVariable Long id) {
-        return ResponseEntity.ok(mediaService.getMediaById(id)  );
+        return ResponseEntity.ok(mediaService.getMediaById(id));
     }
 
     @GetMapping("/media/{id}/file/{fileName}")
@@ -30,10 +30,10 @@ public class MediaController {
                                                        @org.springframework.web.bind.annotation.PathVariable("fileName") String fileName) {
         MediaDto mediaDto = mediaService.getFile(id, fileName);
         System.out.println(mediaDto);
-            return ResponseEntity.ok()
+        return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + fileName + "\"")
                 .contentType(mediaDto.getMediaType())
                 .body(
-                new InputStreamResource(mediaDto.getContent()));
+                        new InputStreamResource(mediaDto.getContent()));
     }
 }

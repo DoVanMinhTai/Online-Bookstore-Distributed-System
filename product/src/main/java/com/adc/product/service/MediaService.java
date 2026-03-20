@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MediaService extends AbstractCircuitBreakFallbackHandler {
     private final RestClient restClient;
     private final ServiceUrlConfig serviceUrlConfig;
@@ -25,6 +27,7 @@ public class MediaService extends AbstractCircuitBreakFallbackHandler {
         }
         final URI url = UriComponentsBuilder.fromUriString(serviceUrlConfig.media())
                 .path("/media/{id}").buildAndExpand(id).toUri();
+        log.info("Calling Media Service URL: {}", url);
         return restClient.get().uri(url)
                 .retrieve().body(MetaData.class);
     }

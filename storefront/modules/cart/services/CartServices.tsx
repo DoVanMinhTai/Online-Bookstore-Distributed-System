@@ -7,18 +7,6 @@ import { CartItemPutVm } from "../model/CartItemPutVm";
 
 const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/cart/storefront`;
 
-async function handleError(response: Response) {
-    let errorMessage = "Something went errors";
-
-    try {
-        const errorJson = await response.json();
-        errorMessage = errorJson.message || errorJson.data || errorJson.status
-    } catch (error) {
-        errorMessage = response.statusText;
-    }
-    return errorMessage
-}
-
 export async function addToCartItem(payload: CartPost): Promise<CartItemGetVm> {
     const response = await apiClientService.post(`${baseUrl}/cart/add`, JSON.stringify(payload));
     if (!response.ok) {
@@ -28,9 +16,8 @@ export async function addToCartItem(payload: CartPost): Promise<CartItemGetVm> {
     return response.json();
 }
 
-
 export async function getNumberCartItem(): Promise<number> {
-    const response = await apiClientService.get(`${baseUrl}/cart/list`);
+    const response = await apiClientService.get(`${baseUrl}/cart/number`);
     if (!response.ok) {
         await handleError(response);
         return 0;
@@ -120,3 +107,14 @@ export async function updateCartItem(productId: number, payload: CartItemPutVm):
     return reponse.json();
  } */
 
+async function handleError(response: Response) {
+    let errorMessage = "Something went errors";
+
+    try {
+        const errorJson = await response.json();
+        errorMessage = errorJson.message || errorJson.data || errorJson.status
+    } catch (error) {
+        errorMessage = response.statusText;
+    }
+    return errorMessage
+}

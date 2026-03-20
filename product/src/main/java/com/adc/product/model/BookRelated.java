@@ -4,7 +4,7 @@ package com.adc.product.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "product_related")
+@Table(name = "book_related")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

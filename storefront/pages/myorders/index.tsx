@@ -144,8 +144,8 @@ export default function Myorders() {
                       <p className="text-sm font-bold text-slate-900 line-clamp-1">{item.productName}</p>
                       <p className="text-xs text-slate-500">Số lượng: {item.quantity}</p>
                       <div className="flex justify-between items-center mt-1">
-                        <p className="text-sm font-bold text-emerald-600">{formatPrice(item.productPrice)}</p>
-                        {item.discountAmount > 0 && (
+                        <p className="text-sm font-bold text-emerald-600">{item.productPrice ? formatPrice(item.productPrice) : formatPrice(0)}</p>
+                        {item.discountAmount && item.discountAmount > 0 && (
                           <p className="text-[10px] text-rose-500 bg-rose-50 px-2 py-0.5 rounded">- {formatPrice(item.discountAmount)}</p>
                         )}
                       </div>

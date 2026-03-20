@@ -1,12 +1,13 @@
 export type OrderItemVm = {
-        id: number;
+        id?: number;
         productId: number;
-        orderId: number;
-        productName: string;
+        orderId?: number;
+        productName?: string;
         quantity: number;
-        productPrice: number;
+        productPrice?: number;
         note: string;
-        discountAmount: number;
-        taxAmount: number;
-        taxPercent: number
+        description?: string;
+        discountAmount?: number;
+        taxAmount?: number;
+        taxPercent?: number
 }

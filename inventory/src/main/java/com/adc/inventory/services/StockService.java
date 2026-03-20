@@ -119,7 +119,7 @@ public class StockService {
                 throw new RuntimeException("OUT_OF_STOCK");
             }
 
-            if(stock.getReversedQuantity() < vm.quantity()) {
+            if (stock.getReversedQuantity() < vm.quantity()) {
                 stock.setReversedQuantity(0L);
             } else {
                 stock.setReversedQuantity(stock.getReversedQuantity() - vm.quantity());
@@ -140,6 +140,8 @@ public class StockService {
 
     @Transactional
     public void reserveStock(Long productId, Long warehouseId, Long quantity) {
+//      Default WarehouseId = 1L;
+        warehouseId = 1L;
         Stock stock = stockRepository.findByProductIdAndWarehouseIdWithLock(productId, warehouseId).orElseThrow();
 
         long availableStock = stock.getQuantity() - stock.getReversedQuantity();
