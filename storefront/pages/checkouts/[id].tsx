@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { getProductById } from '@/modules/catalog/services/ProductServices';
+import { getProductById } from '@/modules/catalog/services/ProductService';
 import { ProductThumbnail } from '@/modules/homepage/models/ProductThumbnail';
-import { AddressDetailVm } from '@/modules/address/model/AddressDetail';
+import { AddressDetailVm } from '@/modules/address/model/Address';
 import { OrdersPostVm } from '@/modules/orders/model/OrdersPostVm';
-import { Checkout } from '@/modules/checkout/model/Checkout'
+import { Checkout } from '@/modules/checkout/models/Checkout'
 import { getCheckoutById } from '@/modules/checkout/service/CheckoutService';
 import CheckoutShippingInfo from '@/modules/checkout/components/CheckoutShippingInfo';
 import CheckoutPaymentMethod from '@/modules/checkout/components/CheckoutPaymentMethod';

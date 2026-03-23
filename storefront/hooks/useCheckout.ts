@@ -1,6 +1,6 @@
-import { deleteCartItemByProductId } from "@/modules/cart/services/CartServices";
-import { CheckoutType } from "@/modules/checkout/model/enum/CheckoutType";
-import { OrderItemVm } from "@/modules/orders/model/OrderItemVm";
+import { deleteCartItemByProductId } from "@/modules/cart/services/CartService";
+import { CheckoutType } from "@/modules/checkout/models/enum/CheckoutType";
+import { OrderItemVm } from "@/modules/orders/model/OrderItem";
 import { OrdersPostVm } from "@/modules/orders/model/OrdersPostVm";
 import { createOrder } from "@/modules/orders/services/OrdersService";
 import { useEffect, useState } from "react";

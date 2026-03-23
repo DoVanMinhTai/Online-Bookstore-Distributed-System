@@ -1,8 +1,8 @@
 import { DeliveryMethod } from "./enum/DeliveryMethod"
 import { PaymentMethod } from "./enum/PaymentMethod";
 import { PaymentStatus } from "./enum/PaymentStatus";
-import { AddressDetailVm } from "@/modules/address/model/AddressDetail";
-import { OrderItemVm } from "./OrderItemVm";
+import { AddressDetailVm } from "@/modules/address/model/Address";
+import { OrderItem } from "./OrderItem";
 
 export type OrdersPostVm = {
     checkoutId?: number;
@@ -19,5 +19,5 @@ export type OrdersPostVm = {
     deliveryMethod?: DeliveryMethod;
     paymentMethod?: PaymentMethod;
     paymentStatus: PaymentStatus;
-    orderItemPostVmList?: OrderItemVm[]
+    orderItemPostVmList?: OrderItem[]
 }

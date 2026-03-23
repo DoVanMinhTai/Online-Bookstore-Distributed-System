@@ -1,16 +1,16 @@
 import { useCartContext } from '@/context/CartContext';
-import { CartItemGetDetailVms } from '@/modules/cart/model/CartItemGetVm'
-import { getCartItemDetailVms, updateCartItem, deleteCartItemByProductId } from '@/modules/cart/services/CartServices';
+import { CartItemGetDetailVms } from '@/modules/cart/models/CartItemGetVm'
+import { getCartItemDetailVms, updateCartItem, deleteCartItemByProductId } from '@/modules/cart/services/CartService';
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import Link from 'next/link';
 import { formatPrice } from '@/utils/formatPrice';
 import { useRouter } from 'next/router';
 import ConfimationDialog from '@/common/dialog/ConfirmationDialog';
 import { CartItem, calculateTotalPrice } from '@/modules/cart/components/CartItem';
-import { Checkout } from '@/modules/checkout/model/Checkout';
+import { Checkout } from '@/modules/checkout/models/Checkout';
 import { useUserInfoContext } from '@/context/UserInforProvider';
 import { createCheckout } from '@/modules/checkout/service/CheckoutService';
-import { CheckoutType } from '@/modules/checkout/model/enum/CheckoutType';
+import { CheckoutType } from '@/modules/checkout/models/enum/CheckoutType';
 
 const Index = () => {
   const [cartItems, setCartItem] = useState<CartItemGetDetailVms[]>([]);

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { formatPrice } from "@/utils/formatPrice";
-import { CartItemGetDetailVms } from "../model/CartItemGetVm";
+import { CartItemGetDetailVms } from "../models/CartItemGetVm";
 import ImageWithFallBack from "@/common/components/ImageWithFallBack";
 import { Trash2, Minus, Plus } from "lucide-react";
 

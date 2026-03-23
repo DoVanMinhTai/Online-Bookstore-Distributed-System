@@ -15,7 +15,6 @@ public record UserAddressPostVm(
         @NotNull Long stateOrProvinceId,
         @NotNull Long countryId,
         AddressType addressType,
-        Boolean isActiveShipping,
-        Boolean isActiveBilling
+        Boolean isDefault
 ) {
 }

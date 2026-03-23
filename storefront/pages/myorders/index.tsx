@@ -1,5 +1,5 @@
-import { OrderItemVm } from '@/modules/orders/model/OrderItemVm';
-import { OrderVm } from '@/modules/orders/model/OrderVm';
+import { OrderItemVm } from '@/modules/orders/model/OrderItem';
+import { OrderVm } from '@/modules/orders/model/Order';
 import { getOrdersByOrderState } from '@/modules/orders/services/OrdersService';
 import React, { useEffect, useState } from 'react';
 import { formatPrice } from '@/utils/formatPrice'; // Giả sử bạn đã có hàm này

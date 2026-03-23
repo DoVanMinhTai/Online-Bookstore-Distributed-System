@@ -14,18 +14,31 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Checkout } from '@/modules/checkout/model/Checkout';
 import { CheckoutType } from '@/modules/checkout/model/enum/CheckoutType';
-import { useCart } from '@/modules/cart/hooks/useCart';
 
 type ProductDetailProps = {
     product: ProductDetail;
 }
 
 export default function ProductDetails({ product }: ProductDetailProps) {
+    const { fetchNumberCartItems } = useCartContext();
+    const { email } = useUserInfoContext();
     const [quantity, setQuantity] = useState<number>(1);
-    const { addProductToCart, isAdding, error } = useCart();
+    const [showNotification, setShowNotification] = useState<boolean>(false);
     const router = useRouter();
 
     const handleQuantityChange = (q: number) => setQuantity(q);
+
+    const onClickHandleAddToCart = async () => {
+        if (quantity < 1) return;
+        try {
+            await addToCartItem({ productId: product.id, quantity });
+            fetchNumberCartItems();
+            setShowNotification(true);
+            setTimeout(() => setShowNotification(false), 3000);
+        } catch (error) {
+            console.error("Add to cart failed", error);
+        }
+    }
 
     const onClickHandleSubmit = async () => {
         if (quantity < 1) return;
@@ -60,7 +73,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
     return (
         <div className="bg-white min-h-screen">
 
-            {isAdding && (
+            {showNotification && (
                 <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm">
                     <div className="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center justify-between mx-4 animate-in fade-in slide-in-from-top-4">
                         <div className="flex items-center gap-3">

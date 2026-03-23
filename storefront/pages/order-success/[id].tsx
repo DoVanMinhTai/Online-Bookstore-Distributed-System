@@ -1,6 +1,6 @@
 import ImageWithFallBack from '@/common/components/ImageWithFallBack';
-import { getProductById } from '@/modules/catalog/services/ProductServices';
-import { OrderVm } from '@/modules/orders/model/OrderVm';
+import { getProductById } from '@/modules/catalog/services/ProductService';
+import { OrderVm } from '@/modules/orders/model/Order';
 import { getOrderById } from '@/modules/orders/services/OrdersService';
 import { useRouter } from 'next/router';
 import Link from 'next/link';

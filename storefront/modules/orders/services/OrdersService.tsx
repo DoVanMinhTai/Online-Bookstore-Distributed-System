@@ -1,6 +1,6 @@
 import apiClientService from "@/common/components/services/ApiClientService";
 import { OrdersPostVm } from "../model/OrdersPostVm";
-import { OrderVm } from "../model/OrderVm";
+import { OrderVm } from "../model/Order";
 
 const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/order/storefront`;
 

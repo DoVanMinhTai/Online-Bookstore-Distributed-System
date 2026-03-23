@@ -1,4 +1,4 @@
-import { getNumberCartItem } from '@/modules/cart/services/CartServices';
+import { getNumberCartItem } from '@/modules/cart/services/CartService';
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { createContext, useContext, useState } from 'react'
 

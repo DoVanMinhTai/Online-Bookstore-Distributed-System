@@ -39,6 +39,10 @@ server {
     location /inventory/ {
         proxy_pass http://inventory;
     }
+
+    location /swagger-ui/ {
+        proxy_pass http://swagger-ui:8080;
+    }
 }
 
 server {
@@ -67,18 +71,6 @@ server {
     proxy_buffers              4 256k;
     proxy_busy_buffers_size    256k;
   }
-}
-
-server {
-    listen 80;
-    server_name swagger.local;
-    location /swagger-ui/ {
-        proxy_pass http://swagger-ui:8090;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
 }
 
 server {

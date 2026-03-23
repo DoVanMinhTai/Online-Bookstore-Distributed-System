@@ -1,5 +1,5 @@
 import AddressForm from '@/modules/address/components/AddressForm'
-import { Address } from '@/modules/address/model/Address'
+import { Address } from '@/modules/address/model/AddressGetVm'
 import { AddressPostVm } from '@/modules/address/model/AddressPostVm'
 import { getAddressById, updateAddress } from '@/modules/address/service/Address'
 import { NextPage } from 'next'

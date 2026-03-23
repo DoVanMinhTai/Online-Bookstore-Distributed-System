@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Address } from '../model/Address'
+import { AddressGetVm } from '../model/AddressGetVm'
 import { FieldErrorsImpl, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { CountryVm } from '@/modules/country/model/CountryVm';
 import { StateOrProvince } from '@/modules/stateorprovince/model/StateOrProvince';
@@ -11,10 +11,10 @@ import ModalHeadersProps from './ModalHeadersProps';
 
 type AddressFormProps = {
   handleSubmit: () => void;
-  register: UseFormRegister<Address>;
-  setValue: UseFormSetValue<Address>;
-  errors: FieldErrorsImpl<Address>;
-  address: Address | undefined;
+  register: UseFormRegister<AddressGetVm>;
+  setValue: UseFormSetValue<AddressGetVm>;
+  errors: FieldErrorsImpl<AddressGetVm>;
+  address: AddressGetVm | undefined;
   isDisplay?: boolean | true;
   buttonText?: string;
   onClose: () => void;

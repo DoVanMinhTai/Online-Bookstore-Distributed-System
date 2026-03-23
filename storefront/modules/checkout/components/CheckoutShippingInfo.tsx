@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import AddressForm from '@/modules/address/components/AddressForm';
-import { Address } from '@/modules/address/model/Address';
+import { Address } from '@/modules/address/model/AddressGetVm';
 import { createUserAddress, updateAddress } from '@/modules/address/service/Address';
-import { AddressDetailVm } from '@/modules/address/model/AddressDetail';
+import { AddressDetailVm } from '@/modules/address/model/Address';
 import { getAddressBillingList, getAddressDefault, getUserAddressList } from '@/modules/profile/service/ProfileService';
 import { getAllCountries } from '@/modules/country/service/CountryService';
 import { CountryVm } from '@/modules/country/model/CountryVm';

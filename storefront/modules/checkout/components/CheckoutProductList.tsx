@@ -1,7 +1,7 @@
 import React from 'react'
 import { ProductThumbnail } from '@/modules/homepage/models/ProductThumbnail'
 import ImageWithFallBack from '@/common/components/ImageWithFallBack'
-import { CheckoutItem } from '../model/CheckoutItem';
+import { CheckoutItem } from '../models/CheckoutItem';
 
 interface Props {
     products: ProductThumbnail[];

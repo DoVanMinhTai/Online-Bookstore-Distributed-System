@@ -2,8 +2,8 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CartItemGetDetailVms, CartItemGetVm } from "../model/CartItemGetVm";
-import { getCartItemDetailVms } from "../services/CartServices";
+import { CartItemGetDetailVms, CartItemGetVm } from "../models/CartItemGetVm";
+import { getCartItemDetailVms } from "../services/CartService";
 import { formatPrice } from "@/utils/formatPrice";
 import ImageWithFallBack from "@/common/components/ImageWithFallBack";
 

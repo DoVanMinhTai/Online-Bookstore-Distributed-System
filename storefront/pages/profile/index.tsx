@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import ImageWithFallBack from '@/common/components/ImageWithFallBack';
 import { useUserInfoContext } from '@/context/UserInforProvider';
 import AddressForm from '@/modules/address/components/AddressForm';
-import { Address } from '@/modules/address/model/Address';
+import { Address } from '@/modules/address/model/AddressGetVm';
 import { CountryVm } from '@/modules/country/model/CountryVm';
 import { getAllCountries, getStateOrProvinces } from '@/modules/country/service/CountryService';
 import { Districts } from '@/modules/districts/model/Districts';

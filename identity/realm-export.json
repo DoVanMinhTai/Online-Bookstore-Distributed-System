@@ -1514,7 +1514,7 @@
         "http://localhost:8091/*",
         "http://localhost:8083/*",
         "http://localhost:8093/*",
-        "http://api.yas.local/*",
+        "http://api.local/*",
         "http://localhost:8090/*",
         "http://localhost:8089/*",
         "http://localhost:8088/*",
@@ -1523,7 +1523,7 @@
         "http://localhost:8086/*"
       ],
       "webOrigins": [
-        "http://api.yas.local",
+        "http://api.local",
         "http://localhost:8088",
         "http://localhost:8089",
         "http://localhost:8084",

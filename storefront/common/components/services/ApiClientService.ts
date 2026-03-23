@@ -30,7 +30,6 @@ interface RequestOptions {
     try {
       const response = await fetch(endpoint, method === 'GET' ? undefined : requestOptions);
   
-      // Workaround to manually redirect in case of CORS error
       if (response.type == 'cors' && response.redirected) {
         window.location.href = response.url;
       }

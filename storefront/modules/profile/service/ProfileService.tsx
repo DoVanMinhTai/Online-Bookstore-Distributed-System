@@ -1,5 +1,5 @@
 import apiClientService from "@/common/components/services/ApiClientService";
-import { AddressDetailVm } from "@/modules/address/model/AddressDetail";
+import { AddressDetailVm } from "@/modules/address/model/Address";
 
 const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/storefront`;
 

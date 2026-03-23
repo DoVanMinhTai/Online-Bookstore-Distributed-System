@@ -18,7 +18,7 @@ public class UserAddressController {
     }
 
     @PostMapping("/storefront/createUserAddress")
-    public ResponseEntity<UserAddressVm> create(@RequestBody UserAddressPostVm userAddressPostVm) {
+    public ResponseEntity<UserAddressVm> createUserAddress(@RequestBody UserAddressPostVm userAddressPostVm) {
         return ResponseEntity.ok(userAddressService.createUserAddress(userAddressPostVm));
     }
 
@@ -28,7 +28,7 @@ public class UserAddressController {
     }
 
     @GetMapping("/storefront/getAddressIsActive")
-    public ResponseEntity<AddressDetailVm> getAddressIsActive() {
+    public ResponseEntity<AddressDetailVm> getUserAddressIsActive() {
         return ResponseEntity.ok(userAddressService.getAddressIsActive());
     }
 
