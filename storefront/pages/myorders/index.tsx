@@ -1,8 +1,8 @@
-import { OrderItemVm } from '@/modules/orders/model/OrderItem';
-import { OrderVm } from '@/modules/orders/model/Order';
+import { OrderItem } from '@/modules/orders/model/OrderItem';
+import { Order } from '@/modules/orders/model/Order';
 import { getOrdersByOrderState } from '@/modules/orders/services/OrdersService';
 import React, { useEffect, useState } from 'react';
-import { formatPrice } from '@/utils/formatPrice'; // Giả sử bạn đã có hàm này
+import { formatPrice } from '@/utils/formatPrice';
 
 const STATUS_TABS = [
   { id: 'pending', label: 'Chờ xác nhận' },
@@ -13,10 +13,10 @@ const STATUS_TABS = [
 ];
 
 export default function Myorders() {
-  const [orders, setOrders] = useState<OrderVm[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [orderStatus, setOrderStatus] = useState('pending');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedOrderItems, setSelectedOrderItems] = useState<OrderItemVm[] | null>(null);
+  const [selectedOrderItems, setSelectedOrderItems] = useState<OrderItem[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -55,11 +55,10 @@ export default function Myorders() {
             <button
               key={tab.id}
               onClick={() => setOrderStatus(tab.id)}
-              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
-                orderStatus === tab.id 
-                ? "bg-slate-900 text-white shadow-lg shadow-slate-200" 
+              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold transition-all ${orderStatus === tab.id
+                ? "bg-slate-900 text-white shadow-lg shadow-slate-200"
                 : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -96,9 +95,9 @@ export default function Myorders() {
                     <div className="text-right space-y-3 w-full md:w-auto">
                       <p className="text-xs text-slate-400 uppercase font-bold tracking-widest">Tổng thanh toán</p>
                       <p className="text-2xl font-black text-emerald-600">{formatPrice(order.totalPrice)}</p>
-                      
+
                       <div className="flex gap-2 justify-end">
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedOrderItems(Array.from(order.orderItemVms || []));
                             setIsModalOpen(true);
@@ -108,9 +107,9 @@ export default function Myorders() {
                           Chi tiết
                         </button>
                         {order.orderStatus === 'PENDING' && (
-                           <button className="px-5 py-2 text-xs font-bold bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">
-                              Hủy đơn
-                           </button>
+                          <button className="px-5 py-2 text-xs font-bold bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">
+                            Hủy đơn
+                          </button>
                         )}
                       </div>
                     </div>

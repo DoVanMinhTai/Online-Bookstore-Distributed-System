@@ -39,6 +39,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> getFeaturedProducts(Pageable pageable);
 
     List<Book> findAllByIdAndBrand_Id(Long id, Long brandId);
+
+    @Query("SELECT b FROM Book b JOIN b.bookCate bc WHERE bc.cate.id = :categoryId "
+            + "AND b.isPublished = TRUE "
+            + "AND b.isVisibleIndividually = TRUE "
+            + "ORDER BY b.id DESC")
+    Page<Book> findAllByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 }
+
 
 

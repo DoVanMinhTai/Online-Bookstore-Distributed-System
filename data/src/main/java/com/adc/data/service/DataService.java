@@ -18,6 +18,7 @@ public class DataService {
     private final DataSource dataSourceProduct;
     private final DataSource dataSourceMedia;
     private final DataSource dataSourceStock;
+    private final DataSource dataSourceLocation;
     private SQLExecuteScript sqlExecuteScript = new SQLExecuteScript();
 
     @Value( "${app.sql.product}")
@@ -29,22 +30,46 @@ public class DataService {
     @Value( "${app.sql.stock}")
     private String stockScripts;
 
+    @Value( "${app.sql.location}")
+    private String locationScripts;
+
     @Autowired
     public DataService(@Qualifier("dataSourceProduct") DataSource dataSourceProduct,
                        @Qualifier("dataSourceMedia") DataSource dataSourceMedia,
-                       @Qualifier("dataSourceStock") DataSource dataSourceStock
+                       @Qualifier("dataSourceStock") DataSource dataSourceStock,
+                       @Qualifier("dataSourceLocation") DataSource dataSourceLocation
     ) {
         this.dataSourceProduct = dataSourceProduct;
         this.dataSourceMedia = dataSourceMedia;
         this.dataSourceStock = dataSourceStock;
+        this.dataSourceLocation = dataSourceLocation;
         this.sqlExecuteScript = sqlExecuteScript;
     }
 
     public SampleDataVm createData() throws SQLException, IOException {
-        sqlExecuteScript.executeScriptForSchema(dataSourceProduct, "public", productScripts);
-        sqlExecuteScript.executeScriptForSchema(dataSourceMedia, "public", mediaScripts);
-        sqlExecuteScript.executeScriptForSchema(dataSourceStock, "public", stockScripts);
+        seedProduct();
+        seedMedia();
+        seedStock();
+        seedLocation();
         return new SampleDataVm("Insert Sample Data successfully!", true);
 
     }
+
+    public void seedProduct() throws SQLException, IOException {
+        sqlExecuteScript.executeScriptForSchema(dataSourceProduct, "public", productScripts);
+    }
+
+    public void seedMedia() throws SQLException, IOException {
+        sqlExecuteScript.executeScriptForSchema(dataSourceMedia, "public", mediaScripts);
+    }
+
+    public void seedStock() throws SQLException, IOException {
+        sqlExecuteScript.executeScriptForSchema(dataSourceStock, "public", stockScripts);
+    }
+
+    public void seedLocation() throws SQLException, IOException {
+        sqlExecuteScript.executeScriptForSchema(dataSourceLocation, "public", locationScripts);
+    }
 }
+
+

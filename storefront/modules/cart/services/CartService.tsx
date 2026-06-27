@@ -17,7 +17,7 @@ export async function addToCartItem(payload: CartPost): Promise<CartItemGetVm> {
 }
 
 export async function getNumberCartItem(): Promise<number> {
-    const response = await apiClientService.get(`${baseUrl}/cart/number`);
+    const response = await apiClientService.get(`${baseUrl}/cart/list`);
     if (!response.ok) {
         await handleError(response);
         return 0;

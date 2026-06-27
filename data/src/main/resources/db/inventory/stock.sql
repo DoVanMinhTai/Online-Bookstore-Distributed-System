@@ -7,4 +7,8 @@ SELECT
 FROM
     generate_series(1, 20) AS p(id)
         CROSS JOIN
-    (SELECT id FROM warehouse WHERE id IN (1, 2, 3)) AS w;
+    (SELECT id FROM warehouse WHERE id IN (1, 2, 3)) AS w
+WHERE NOT EXISTS (
+    SELECT 1 FROM stock s
+    WHERE s.product_id = p.id AND s.warehouse_id = w.id
+);

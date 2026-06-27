@@ -2,13 +2,13 @@ com/example/customer/service/LocationService$1.class
 com/example/customer/viewmodel/customer/CustomerVm.class
 com/example/customer/config/SwaggerConfig.class
 com/example/customer/config/KeyCloakPropsConfig.class
-com/example/customer/respository/UserAddressRespository.class
 com/example/customer/viewmodel/useraddress/UserAddressVm.class
 com/example/customer/config/KeyCloakClientConfig.class
 com/example/customer/model/enumeration/AddressType.class
 com/example/customer/model/UserAddress$UserAddressBuilder.class
 com/example/customer/viewmodel/customer/CustomerAdminVm.class
 com/example/customer/model/UserAddress.class
+com/example/customer/respository/UserAddressRepository.class
 com/example/customer/controller/CustomerController.class
 com/example/customer/CustomerApplication.class
 com/example/customer/listener/CustomerAuditingEntityListener.class

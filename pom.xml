@@ -23,7 +23,7 @@
         <module>order</module>
         <module>inventory</module>
         <module>storefrontbff</module>
-        <!--<module>backoffice-bff</module>-->
+        <module>backoffice-bff</module>
         <module>data</module>
     </modules>
     <properties>

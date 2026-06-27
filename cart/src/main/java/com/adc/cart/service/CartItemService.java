@@ -28,10 +28,17 @@ public class CartItemService {
     private final CartItemMapper cartItemMapper;
 
     @Transactional
-    public CartItemGetVm addCartItem(CartItemPost cartItemPostVm) {
-        validateProduct(cartItemPostVm.productId());
+    public CartItemGetVm addCartItem(CartItemPost cartItemPost) {
+        validateProduct(cartItemPost.productId());
         String currentUser = AuthenticationUtils.extractUserId();
-        CartItem cartItem = performAddCartItem(cartItemPostVm, currentUser);
+        
+        CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(currentUser, cartItemPost.productId())
+                .map(existingItem -> {
+                    existingItem.setQuantity(existingItem.getQuantity() + cartItemPost.quantity());
+                    return cartItemRepository.save(existingItem);
+                })
+                .orElseGet(() -> cartItemRepository.save(cartItemMapper.toCartItem(cartItemPost, currentUser)));
+
         return cartItemMapper.toGetVm(cartItem);
     }
 
@@ -39,18 +46,17 @@ public class CartItemService {
     public CartItemGetVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm) {
         String currentUser = AuthenticationUtils.extractUserId();
         CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(currentUser, productId)
-                .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.CART_ITEM_NOT_FOUND + "FOR:", productId, currentUser));
-        int quantity = cartItemPutVm.quantity();
-        cartItem.setQuantity(quantity);
-        cartItemRepository.save(cartItem);
-        return cartItemMapper.toGetVm(cartItem);
+                .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.CART_ITEM_NOT_FOUND + " FOR:", productId, currentUser));
+        
+        cartItem.setQuantity(cartItemPutVm.quantity());
+        return cartItemMapper.toGetVm(cartItemRepository.save(cartItem));
     }
 
     @Transactional(readOnly = true)
     public List<CartItemGetVm> getCartItems() {
         String currentUserId = AuthenticationUtils.extractUserId();
-        List<CartItem> listCartItemByIdUser = cartItemRepository.findByCustomerIdOrderByCreatedOnDesc(currentUserId);
-        return cartItemMapper.toGetVms(listCartItemByIdUser);
+        List<CartItem> items = cartItemRepository.findByCustomerIdOrderByCreatedOnDesc(currentUserId);
+        return cartItemMapper.toGetVms(items);
     }
 
     @Transactional
@@ -60,54 +66,38 @@ public class CartItemService {
     }
 
     @Transactional
-    public List<CartItemGetVm> deleteOrAdjustCartItem(List<CartItemDeleteVms> cartItemDeleteVms) {
-        List<CartItem> updateAdjust = new ArrayList<>();
-        List<CartItem> deleteItems = new ArrayList<>();
-        Map<Long, CartItem> cartGetById = mapCartItemToProductId(cartItemDeleteVms);
+    public List<CartItemGetVm> deleteOrAdjustCartItem(List<CartItemDeleteVms> itemsToDelete) {
+        String currentUserId = AuthenticationUtils.extractUserId();
+        List<Long> productIds = itemsToDelete.stream().map(CartItemDeleteVms::productId).toList();
+        
+        Map<Long, CartItem> existingCarts = cartItemRepository.findByCustomerIdAndProductIdIn(currentUserId, productIds)
+                .stream()
+                .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
 
-        for (CartItemDeleteVms cartItemDelete : cartItemDeleteVms) {
-            Optional<CartItem> optionalCartItem = Optional.ofNullable(cartGetById.get(cartItemDelete.productId()));
-            optionalCartItem.ifPresent(cartItem -> {
-                if (cartItemDelete.quantity() >= cartItem.getQuantity()) {
-                    deleteItems.add(cartItem);
-                } else {
-                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDelete.quantity());
-                    updateAdjust.add(cartItem);
-                }
-            });
+        List<CartItem> toUpdate = new ArrayList<>();
+        List<CartItem> toDelete = new ArrayList<>();
+
+        for (CartItemDeleteVms request : itemsToDelete) {
+            CartItem current = existingCarts.get(request.productId());
+            if (current == null) continue;
+
+            if (request.quantity() >= current.getQuantity()) {
+                toDelete.add(current);
+            } else {
+                current.setQuantity(current.getQuantity() - request.quantity());
+                toUpdate.add(current);
+            }
         }
 
-        cartItemRepository.deleteAll(deleteItems);
-        List<CartItem> updateCartItem = cartItemRepository.saveAll(updateAdjust);
-        return cartItemMapper.toGetVms(updateCartItem);
+        if (!toDelete.isEmpty()) cartItemRepository.deleteAll(toDelete);
+        List<CartItem> updatedItems = !toUpdate.isEmpty() ? cartItemRepository.saveAll(toUpdate) : Collections.emptyList();
+        
+        return cartItemMapper.toGetVms(updatedItems);
     }
 
-    private Map<Long, CartItem> mapCartItemToProductId(List<CartItemDeleteVms> cartItemDeleteVms) {
-        String currentUserId = AuthenticationUtils.extractUserId();
-        List<Long> productIds = cartItemDeleteVms.stream().map(CartItemDeleteVms::productId).toList();
-        List<CartItem> cartItems = cartItemRepository.findByCustomerIdAndProductIdIn(currentUserId, productIds);
-        return cartItems.stream().collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
-    }
-
-    private CartItem performAddCartItem(CartItemPost cartItemPostVm, String currentUser) {
-        return (CartItem) cartItemRepository.findByCustomerIdAndProductId(currentUser, cartItemPostVm.productId())
-                .map(existCartItem -> updateExisttingCartItem(cartItemPostVm, existCartItem))
-                .orElseGet(() -> createNewCartItem(cartItemPostVm, currentUser));
-    }
-
-    private CartItem createNewCartItem(CartItemPost cartItemPostVm, String currentUser) {
-        CartItem cartItem = cartItemMapper.toCartItem(cartItemPostVm, currentUser);
-        return cartItemRepository.save(cartItem);
-    }
-
-    private CartItem updateExisttingCartItem(CartItemPost cartItemPostVm, CartItem existCartItem) {
-        existCartItem.setQuantity(existCartItem.getQuantity() + cartItemPostVm.quantity());
-        return cartItemRepository.save(existCartItem);
-    }
-
-    private void validateProduct(Long idProduct) {
-        if (!productService.existsProduct(idProduct)) {
-            throw new NotFoundException(Constant.ErrorCode.PRODUCT_NOT_FOUND, idProduct);
+    private void validateProduct(Long productId) {
+        if (!productService.existsProduct(productId)) {
+            throw new NotFoundException(Constant.ErrorCode.PRODUCT_NOT_FOUND, productId);
         }
     }
 }

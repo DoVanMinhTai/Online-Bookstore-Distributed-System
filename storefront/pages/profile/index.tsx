@@ -3,14 +3,12 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import ImageWithFallBack from '@/common/components/ImageWithFallBack';
 import { useUserInfoContext } from '@/context/UserInforProvider';
 import AddressForm from '@/modules/address/components/AddressForm';
-import { Address } from '@/modules/address/model/AddressGetVm';
 import { CountryVm } from '@/modules/country/model/CountryVm';
 import { getAllCountries, getStateOrProvinces } from '@/modules/country/service/CountryService';
-import { Districts } from '@/modules/districts/model/Districts';
-import { getDistrictsList } from '@/modules/districts/services/Districts';
 import { getAddressDefault } from '@/modules/profile/service/ProfileService';
 import { StateOrProvince } from '@/modules/stateorprovince/model/StateOrProvince';
 import { NextPage } from 'next';
+import { AddressGetVm } from '@/modules/address/model/AddressGetVm';
 
 enum Tabs {
   Tab1 = 'Tab1',
@@ -30,21 +28,19 @@ const Profile: NextPage = () => {
 
   const { firstname, email, lastname } = useUserInfoContext();
 
-  const [adddressDefault, setAddressDefault] = useState<Address | null | undefined>();
+  const [adddressDefault, setAddressDefault] = useState<AddressGetVm | null | undefined>();
 
   const [coutries, setCountries] = useState<CountryVm[]>();
   const [stateOrProvinces, setStateOrProvinces] = useState<StateOrProvince[]>();
-  const [districts, setDistricts] = useState<Districts[]>();
 
   const [selectedCountryVm, setSelectedCountry] = useState<CountryVm>();
-  const [selectedDistrict, setSelectedDistrict] = useState<Districts>();
   const [selectedStateOrProvinces, setSelectedStateOrProvinces] = useState<StateOrProvince>();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { register
     , handleSubmit: handleSubmitUpdateAddress
     , setValue
-    , formState: { errors } } = useForm<Address>();
+    , formState: { errors } } = useForm<AddressGetVm>();
 
   const [activeTab, setActiveTab] = useState<Tabs.Tab1 | Tabs.Tab2 | Tabs.Tab3>(Tabs.Tab1);
 
@@ -58,7 +54,7 @@ const Profile: NextPage = () => {
     setActiveTab(tab);
   }
 
-  const onSubmitUpdateAddress: SubmitHandler<Address> = async () => {
+  const onSubmitUpdateAddress: SubmitHandler<AddressGetVm> = async () => {
   }
 
   /* const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -80,8 +76,6 @@ const Profile: NextPage = () => {
         }).catch((error) => console.error(error));
       getAllCountries().then((res) => setCountries(res))
         .catch((error) => console.error(error));
-      getDistrictsList().then((res) => setDistricts(res))
-        .catch((error) => console.error(error));
     }
   }, [adddressDefault])
 
@@ -96,21 +90,16 @@ const Profile: NextPage = () => {
       setSelectedStateOrProvinces(active);
     }
 
-    if (districts && adddressDefault) {
-      const activeDistrict = districts.find((item) => item.id === adddressDefault?.districtId);
-      setSelectedDistrict(activeDistrict);
-    }
-
-  }, [coutries, stateOrProvinces, districts, adddressDefault]);
+  }, [coutries, stateOrProvinces, adddressDefault]);
 
   // useEffect(() => {
-    // const dummyCarts: Cart[] = [
-    //   { id: 1, productName: 'Gạo ST25', quantity: 2, totalPrice: 40000, status: 'pending' },
-    //   { id: 2, productName: 'Gạo Lứt', quantity: 1, totalPrice: 20000, status: 'shipping' },
-    //   { id: 3, productName: 'Gạo Nhật', quantity: 3, totalPrice: 60000, status: 'cancelled' },
-    // ];
-    // const filter = dummyCarts.filter((cartStatus) => cartStatus.status === orderStatus);
-    // setCarts(filter)
+  // const dummyCarts: Cart[] = [
+  //   { id: 1, productName: 'Gạo ST25', quantity: 2, totalPrice: 40000, status: 'pending' },
+  //   { id: 2, productName: 'Gạo Lứt', quantity: 1, totalPrice: 20000, status: 'shipping' },
+  //   { id: 3, productName: 'Gạo Nhật', quantity: 3, totalPrice: 60000, status: 'cancelled' },
+  // ];
+  // const filter = dummyCarts.filter((cartStatus) => cartStatus.status === orderStatus);
+  // setCarts(filter)
   // }, [dummyCarts, orderStatus])
 
   return (
@@ -161,10 +150,6 @@ const Profile: NextPage = () => {
               <div className="flex w-full gap-3 items-center">
                 <label className="font-bold text-sm w-[30%] text-gray-700">Địa chỉ cụ thể 2: </label>
                 <h3 className="w-[70%] font-bold text-sm text-gray-700">{adddressDefault?.addressLine2}</h3>
-              </div>
-              <div className="flex w-full gap-3 items-center">
-                <label className="font-bold text-sm w-[30%] text-gray-700">Quận/Huyện: </label>
-                <h3 className="w-[70%] font-bold text-sm text-gray-700">{selectedDistrict?.name}</h3>
               </div>
               <div className="flex w-full gap-3 items-center">
                 <label className="font-bold text-sm w-[30%] text-gray-700">Tỉnh/Thành phố: </label>

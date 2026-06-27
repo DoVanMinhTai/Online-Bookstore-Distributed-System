@@ -1,5 +1,5 @@
 import apiClientService from "@/common/components/services/ApiClientService";
-import { AddressDetailVm } from "@/modules/address/model/Address";
+import { Address } from "@/modules/address/model/Address";
 
 const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/storefront`;
 
@@ -12,7 +12,7 @@ export async function getMyProfile() {
     }
 }
 
-export async function getUserAddressList(): Promise<AddressDetailVm[]> {
+export async function getUserAddressList(): Promise<Address[]> {
     const reponse = await apiClientService.get(`${baseUrl}/getUserAddressList`)
     if (!reponse.ok) {
         return [];
@@ -21,7 +21,7 @@ export async function getUserAddressList(): Promise<AddressDetailVm[]> {
     }
 }
 
-export async function getAddressDefault(): Promise<AddressDetailVm | null> {
+export async function getAddressDefault(): Promise<Address | null> {
     const reponse = await apiClientService.get(`${baseUrl}/getAddressIsActive`);
     if (!reponse.ok) {
         return null;
@@ -33,14 +33,14 @@ export async function getAddressDefault(): Promise<AddressDetailVm | null> {
     }
 
     try {
-        return JSON.parse(text) as AddressDetailVm;
+        return JSON.parse(text) as Address;
     } catch (err) {
         console.warn('getAddressDefault: invalid JSON response', err);
         return null;
     }
 }
 
-export async function getAddressBillingList(): Promise<AddressDetailVm[]> {
+export async function getAddressBillingList(): Promise<Address[]> {
     const reponse = await apiClientService.get(`${baseUrl}/getAddressBillingIsActive`);
     if (!reponse.ok) {
         return [];

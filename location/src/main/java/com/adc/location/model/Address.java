@@ -38,7 +38,7 @@ public class Address {
     private String zipCode;
 
     @ManyToOne
-    @JoinColumn(name = "district_id", nullable = false)
+    @JoinColumn(name = "district_id")
     private District district;
 
     @ManyToOne

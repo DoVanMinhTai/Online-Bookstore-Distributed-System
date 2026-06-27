@@ -3,4 +3,7 @@ INSERT INTO brand (name, slug, is_published, created_by) VALUES
                                                              ('Alpha Books', 'alpha-books', true, 'admin'),
                                                              ('Nhã Nam', 'nha-nam', true, 'admin'),
                                                              ('Kim Đồng', 'kim-dong', true, 'admin'),
-                                                             ('NXB Tổng Hợp', 'nxb-tong-hop', true, 'system');
+                                                             ('NXB Tổng Hợp', 'nxb-tong-hop', true, 'system')
+ON CONFLICT (slug) DO UPDATE
+SET name = EXCLUDED.name,
+    is_published = EXCLUDED.is_published;

@@ -40,6 +40,12 @@ export const ApiRoute = {
         GET_PRODUCT_BEST_SELLING: `${BASEURL}/product/storefront/products/productsBestSelling`,
         GET_PRODUCT_FEATURE: `${BASEURL}/product/storefront/products/productFeatured`,
     },
+    CATEGORY: {
+        GET_CATEGORIES: `${BASEURL}/product/storefront/categories`,
+        GET_CATEGORY_BY_ID: (id: number | string) => `${BASEURL}/product/storefront/categories/${id}`,
+        GET_BOOKS_BY_CATEGORY: (id: number | string, pageNo = 0, pageSize = 12) =>
+            `${BASEURL}/product/storefront/categories/${id}/books?pageNo=${pageNo}&pageSize=${pageSize}`,
+    },
     USER: {
         PROFILE: `${BASEURL}/customer/storefront/profile`,
         GET_USER_ADDRESS_LIST: `${BASEURL}/customer/storefront/addresses`,

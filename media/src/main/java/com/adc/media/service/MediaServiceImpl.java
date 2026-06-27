@@ -8,13 +8,14 @@ import com.adc.media.repository.FileSystemRepository;
 import com.adc.media.repository.MediaRepository;
 import com.adc.media.viewmodel.MediaVm;
 import com.adc.media.viewmodel.MetaData;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
-import java.util.Optional;
+import java.util.List;
+
 
 @Service
 @lombok.RequiredArgsConstructor
@@ -37,13 +38,32 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
+    @Cacheable(value = "mediaById", key = "#id", unless = "#result == null")
     public MediaVm getMediaById(Long id) {
         MetaData metaData = mediaRepository.findByIdWithoutFileInReturn(id);
+        if (metaData == null) {
+            return null;
+        }
+        return toMediaVm(metaData);
+    }
+
+    @Override
+    public List<MediaVm> getMediaByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return mediaRepository.findAllByIdInWithoutFileInReturn(ids).stream()
+                .map(this::toMediaVm)
+                .toList();
+    }
+
+    private MediaVm toMediaVm(MetaData metaData) {
         String url = getMediaUrl(metaData.id(), metaData.fileName());
         return new MediaVm(metaData.id(), metaData.caption(),
                 metaData.fileName(), metaData.mediaType(),
                 url);
     }
+
 
     private String getMediaUrl(Long id, String fileName) {
         return UriComponentsBuilder.fromUriString(serviceUrlConfig.url())

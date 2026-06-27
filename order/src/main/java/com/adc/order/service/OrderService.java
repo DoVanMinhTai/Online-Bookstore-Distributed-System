@@ -2,6 +2,11 @@ package com.adc.order.service;
 
 import com.adc.commonlibrary.exception.NotFoundException;
 import com.adc.commonlibrary.utils.AuthenticationUtils;
+import com.adc.commonlibrary.model.OutboxService;
+import com.adc.commonlibrary.saga.SagaEvent;
+import com.adc.commonlibrary.saga.SagaTopics;
+import com.adc.commonlibrary.saga.payload.OrderCreatedPayload;
+import com.adc.commonlibrary.saga.payload.OrderItemPayload;
 import com.adc.order.model.Order;
 import com.adc.order.model.OrderAddress;
 import com.adc.order.model.OrderItem;
@@ -10,13 +15,14 @@ import com.adc.order.model.enumeration.OrderStatus;
 import com.adc.order.model.enumeration.PaymentStatus;
 import com.adc.order.repository.OrderItemRepository;
 import com.adc.order.repository.OrderRepository;
+import com.adc.order.saga.OrderSagaState;
+import com.adc.order.saga.OrderSagaStateRepository;
 import com.adc.order.viewmodel.PaymentOrderStatusVm;
 import com.adc.order.viewmodel.order.OrderItemVm;
 import com.adc.order.viewmodel.order.OrderPostVm;
 import com.adc.order.viewmodel.order.OrderVm;
 import com.adc.order.viewmodel.orderaddress.OrderAddressPostVm;
-import com.adc.order.viewmodel.stock.StockDeleteVm;
-import com.adc.order.viewmodel.stock.StockReservationVm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +40,9 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final InventoryService inventoryService;
+    private final OutboxService outboxService;
+    private final OrderSagaStateRepository sagaStateRepository;
+    private final ObjectMapper objectMapper;
 
     public List<Long> findProductIdsByCompletedOrders() {
         return orderItemRepository.findProductIdsByCompletedOrders();
@@ -43,13 +52,6 @@ public class OrderService {
     public OrderVm createOrder(OrderPostVm orderPostVm) {
         OrderAddress shippingAddress = mapAddress(orderPostVm.shippingAddressPostVm());
         OrderAddress billingAddress = mapAddress(orderPostVm.billingAddressPostVm());
-
-        // double total = 0;
-        // for(var item : orderPostVm.orderItemPostVmList()) {
-        //    Product product = productRepo.findById(item.productId()).orElseThrow();
-        //    checkInventory(product, item.quantity());
-        //    total += product.getPrice() * item.quantity();
-        // }
 
         Order order = Order.builder()
                 .email(orderPostVm.email())
@@ -82,13 +84,29 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
         OrderVm orderVm = OrderVm.fromModel(order, orderItems);
 
-        List<StockReservationVm> stockReservationVms = orderItems.stream().map(item -> new StockReservationVm(
-                item.getProductId(),
-                item.getQuantity(),
-                item.getWarehouseId()
-                )).collect(Collectors.toList());
-        inventoryService.reserveStock(stockReservationVms);
-        acceptOrder(orderVm.id());
+        // Build structured OrderCreated saga event and write to outbox (same transaction)
+        List<OrderItemPayload> itemPayloads = orderItems.stream()
+                .map(i -> new OrderItemPayload(i.getProductId(), i.getQuantity(), i.getWarehouseId()))
+                .toList();
+        OrderCreatedPayload eventPayload = new OrderCreatedPayload(
+                order.getId(), itemPayloads, order.getTotalPrice(), order.getCustomerId());
+
+        try {
+            String payloadJson = objectMapper.writeValueAsString(
+                    new SagaEvent<>(order.getId().toString(), "OrderCreated", eventPayload, ZonedDateTime.now()));
+            outboxService.createOutbox(order.getId().toString(), "OrderCreated", payloadJson, SagaTopics.ORDER_EVENTS);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize OrderCreated event", e);
+        }
+
+        // Create saga state to track this order's saga lifecycle
+        sagaStateRepository.save(OrderSagaState.builder()
+                .orderId(order.getId())
+                .currentStep("AWAITING_STOCK_RESERVATION")
+                .lastEventType("OrderCreated")
+                .build());
+
+        // Order stays PENDING — inventory will confirm/reject asynchronously via Kafka
         return orderVm;
     }
 

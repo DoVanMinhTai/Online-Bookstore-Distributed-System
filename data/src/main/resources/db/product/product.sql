@@ -25,4 +25,21 @@ INSERT INTO book (
       (17, 'Ngôn ngữ cơ thể', 'The Definitive Book...', 'Body Language', 'ngon-ngu-co-the', 'Sách Ngôn ngữ cơ thể', '<p>Sách Ngôn ngữ cơ thể</p>', 'Bìa mềm', 250, true, true, false, true, '2004-01-01', NULL, 0, 150000, 100, '13x20.5 cm', 10, 0.4, 400, 'Vừa', 'Allan Pease', 17, 5, 5, 100, 'Sách Ngôn ngữ cơ thể', 'body, language', 'Sách Ngôn ngữ cơ thể', '14x21x3 cm'),
       (18, 'Sống 365 ngày một năm', 'How to live 365 days...', 'How to live 365 days', 'song-365-ngay', 'Sách Sống 365 ngày...', '<p>Sách Sống 365 ngày...</p>', 'Bìa mềm', 250, true, true, false, true, '1954-01-01', NULL, 0, 160000, 100, '13x20.5 cm', 10, 0.4, 400, 'Vừa', 'John A. Schindler', 18, 1, 5, 100, 'Sách Sống 365 ngày', '365, ngay', 'Sách Sống 365 ngày', '14x21x3 cm'),
       (19, 'Ăn gì ngăn ngừa ung thư', 'Tell Me What to Eat...', 'Tell Me What to Eat', 'an-gi-ngan-ung-thu', 'Sách Ăn gì ngăn ngừa...', '<p>Sách Ăn gì ngăn ngừa...</p>', 'Bìa mềm', 250, true, true, false, true, '2000-01-01', NULL, 0, 170000, 100, '13x20.5 cm', 10, 0.4, 400, 'Vừa', 'Elaine Magee', 19, 2, 4, 100, 'Sách Ăn gì ngăn ngừa', 'cancer, eat', 'Sách Ăn gì ngăn ngừa', '14x21x3 cm'),
-      (20, 'Thanh lọc tâm trí', 'Detox Your Mind...', 'Detox Your Mind', 'thanh-loc-tam-tri', 'Sách Thanh lọc tâm trí', '<p>Sách Thanh lọc tâm trí</p>', 'Bìa mềm', 250, true, true, false, true, '2000-01-01', NULL, 0, 180000, 100, '13x20.5 cm', 10, 0.4, 400, 'Vừa', 'Jane Scrivner', 20, 3, 2, 100, 'Sách Thanh lọc tâm trí', 'detox', 'Sách Thanh lọc tâm trí', '14x21x3 cm');
+      (20, 'Thanh lọc tâm trí', 'Detox Your Mind...', 'Detox Your Mind', 'thanh-loc-tam-tri', 'Sách Thanh lọc tâm trí', '<p>Sách Thanh lọc tâm trí</p>', 'Bìa mềm', 250, true, true, false, true, '2000-01-01', NULL, 0, 180000, 100, '13x20.5 cm', 10, 0.4, 400, 'Vừa', 'Jane Scrivner', 20, 3, 2, 100, 'Sách Thanh lọc tâm trí', 'detox', 'Sách Thanh lọc tâm trí', '14x21x3 cm')
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    title = EXCLUDED.title,
+    title_without_series = EXCLUDED.title_without_series,
+    slug = EXCLUDED.slug,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    price = EXCLUDED.price,
+    author_name = EXCLUDED.author_name,
+    thumbnail_media_id = EXCLUDED.thumbnail_media_id,
+    publisher_Id = EXCLUDED.publisher_Id,
+    brand_id = EXCLUDED.brand_id,
+    is_published = EXCLUDED.is_published,
+    is_featured = EXCLUDED.is_featured;
+
+-- Keep the id sequence in sync with the explicitly inserted ids
+SELECT setval(pg_get_serial_sequence('book', 'id'), (SELECT MAX(id) FROM book));

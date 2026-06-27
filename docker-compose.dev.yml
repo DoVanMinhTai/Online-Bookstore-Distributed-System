@@ -87,6 +87,8 @@ services:
       - SERVER_SERVLET_CONTEXT_PATH= /inventory
       - PUBLIC_API_URL=${PUBLIC_API_URL}/inventory
       - SERVER_PORT
+    depends_on:
+      - redis
     networks:
       - adc-network
   media:
@@ -165,6 +167,35 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
     networks:
       - adc-network
+
+  backoffice-bff-svc:
+      container_name: backoffice-bff
+      image: eclipse-temurin:21-jre-alpine
+      volumes:
+        - ./backoffice-bff/target:/app-bin
+      entrypoint: ["java", "-jar", "/app-bin/backoffice-bff-1.0-SNAPSHOT.jar"]
+      environment:
+        - SPRING_PROFILES_ACTIVE=dev
+        - SERVER_PORT=8089
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      networks:
+        - adc-network
+      depends_on:
+        - identity.local
+
+  backoffice-nextjs:
+      container_name: backoffice-nextjs
+      build:
+          context: ./backoffice
+          dockerfile: Dockerfile
+      image: backoffice-nextjs:latest
+      extra_hosts:
+        - "backoffice.local:host-gateway"
+      networks:
+          - adc-network
+      depends_on:
+          - backoffice-bff-svc
   postgres:
     image: postgres:16-alpine
     hostname: ${POSTGRES_HOST}
@@ -184,6 +215,19 @@ services:
       - adc-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - adc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5

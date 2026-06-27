@@ -8,8 +8,8 @@ services:
       - ./nginx/configuration/custom_proxy_settings.conf:/etc/nginx/conf.d/custom_proxy_settings.conf
     ports:
       - "80:80"
-    extra_hosts:
-      - "host.docker.internal:192.168.112.1"
+    # extra_hosts:
+    #   - "host.docker.internal:192.168.112.1"
     networks:
       - adc-network
   identity.local:
@@ -79,6 +79,8 @@ services:
       - SERVER_SERVLET_CONTEXT_PATH= /inventory
       - PUBLIC_API_URL=${PUBLIC_API_URL}/inventory
       - SERVER_PORT
+    depends_on:
+      - redis
     networks:
       - adc-network
   media:
@@ -145,6 +147,34 @@ services:
       depends_on:
           - storefront
           - identity.local
+
+  backoffice-bff-svc:
+      container_name: backoffice-bff
+      build: ./backoffice-bff
+      image: backoffice-bff:latest
+      environment:
+        - SPRING_PROFILES_ACTIVE=prod
+        - SERVER_PORT=8089
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      networks:
+        - adc-network
+      depends_on:
+        - identity.local
+
+  backoffice-nextjs:
+      container_name: backoffice-nextjs
+      extra_hosts:
+        - "backoffice.local:host-gateway"
+      build:
+          context: ./backoffice
+          dockerfile: Dockerfile
+      image: backoffice-nextjs:latest
+      networks:
+          - adc-network
+      depends_on:
+          - backoffice-bff-svc
+          - identity.local
   product:
       build: ./product
       container_name: product
@@ -156,6 +186,29 @@ services:
         - SERVER_SERVLET_CONTEXT_PATH=/product
         - SERVER_PORT
         - PUBLIC_API_URL=${PUBLIC_API_URL}/product
+      volumes:
+        - product_index:/data/index
+      networks:
+        - adc-network
+  data:
+      build: ./data
+      container_name: data
+      image: data:latest
+      environment:
+        - SPRING_PROFILES_ACTIVE=prod
+        - SPRING_DATASOURCE_BOOK_URL=jdbc:postgresql://postgres:5432/book
+        - SPRING_DATASOURCE_MEDIA_URL=jdbc:postgresql://postgres:5432/media
+        - SPRING_DATASOURCE_STOCK_URL=jdbc:postgresql://postgres:5432/inventory
+        - SPRING_DATASOURCE_USERNAME=admin
+        - SPRING_DATASOURCE_PASSWORD=admin
+        - APP_SEED_ON_STARTUP=true
+      volumes:
+        - ./data/images:/images
+      depends_on:
+        - postgres
+        - product
+        - media
+        - inventory
       networks:
         - adc-network
   swagger-ui:
@@ -169,6 +222,32 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
     networks:
       - adc-network
+  zookeeper:
+    image: bitnamilegacy/zookeeper:3.9
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    networks:
+      - adc-network
+
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - adc-network
+
   postgres:
     image: postgres:16-alpine
     hostname: ${POSTGRES_HOST}
@@ -187,6 +266,19 @@ services:
       - adc-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - adc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -226,3 +318,4 @@ networks:
 volumes:
   postgres:
   pgadmin:
+  product_index:

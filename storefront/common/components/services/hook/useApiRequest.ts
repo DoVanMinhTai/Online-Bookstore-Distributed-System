@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { ApiError } from '../handleApiError';
+import { DEFAULT_ERROR_MESSAGE } from '@/constants/httpStatus';
 
 export interface UseApiRequestState<T> {
   data: T | null;
@@ -16,9 +19,15 @@ export function useApiRequest<T>(
   requestFn: ApiRequestFn<T>,
   options?: {
     immediate?: boolean;
+    /**
+     * Show an error toast automatically when the request fails.
+     * ApiError instances are already toasted by the API client, so this only
+     * toasts errors that slipped through (default false to avoid duplicates).
+     */
+    showErrorToast?: boolean;
   }
 ): UseApiRequestResult<T> {
-  const { immediate = true } = options || {};
+  const { immediate = true, showErrorToast = false } = options || {};
 
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -32,17 +41,23 @@ export function useApiRequest<T>(
       const result = await requestFn();
       setData(result);
     } catch (err: unknown) {
-      let message = 'Đã xảy ra lỗi khi gọi API.';
+      let message = DEFAULT_ERROR_MESSAGE;
+      // ApiError already carries a normalized, user-friendly message.
+      const alreadyToasted = err instanceof ApiError;
 
       if (err instanceof Error && err.message) {
         message = err.message;
       }
 
       setError(message);
+
+      if (showErrorToast && !alreadyToasted) {
+        toast.error(message);
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [requestFn]);
+  }, [requestFn, showErrorToast]);
 
   useEffect(() => {
     if (immediate) {

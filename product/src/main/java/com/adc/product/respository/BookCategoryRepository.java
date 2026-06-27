@@ -11,7 +11,8 @@ import java.util.List;
 
 @Repository
 public interface BookCategoryRepository extends JpaRepository<Cate, Long> {
-//    Page<BookCate> findAllByCategory(Pageable pageable, Cate category);
 
-//    List<BookCate> findAllByBookId(Long productId);
+    List<Cate> findAllByActiveTrueOrderByNameAsc();
 }
+
+

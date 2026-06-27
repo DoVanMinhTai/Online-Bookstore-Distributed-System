@@ -11,7 +11,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
 
 @Validated
 @RestController
@@ -24,6 +28,12 @@ public class MediaController {
     public ResponseEntity<MediaVm> getMediaById(@PathVariable Long id) {
         return ResponseEntity.ok(mediaService.getMediaById(id));
     }
+
+    @GetMapping("/media/ids")
+    public ResponseEntity<List<MediaVm>> getMediaByIds(@RequestParam("ids") List<Long> ids) {
+        return ResponseEntity.ok(mediaService.getMediaByIds(ids));
+    }
+
 
     @GetMapping("/media/{id}/file/{fileName}")
     public ResponseEntity<InputStreamResource> getFile(@Validated @org.springframework.web.bind.annotation.PathVariable("id") Long id,

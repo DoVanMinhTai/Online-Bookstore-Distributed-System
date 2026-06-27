@@ -1,4 +1,4 @@
-import { AddressDetailVm } from "@/modules/address/model/Address";
+import { Address } from "@/modules/address/model/Address";
 import { DeliveryMethod } from "./enum/DeliveryMethod";
 import { PaymentStatus } from "./enum/PaymentStatus";
 import { DeliveryStatus } from "./enum/DeliveryStatus";
@@ -8,8 +8,8 @@ import { OrderItem } from "./OrderItem";
 export type Order = {
     id: number;
     email: string;
-    shippingAddressVm: AddressDetailVm;
-    billingAddressVm: AddressDetailVm;
+    shippingAddressVm: Address;
+    billingAddressVm: Address;
     note: string;
     tax: number;
     discount: number;

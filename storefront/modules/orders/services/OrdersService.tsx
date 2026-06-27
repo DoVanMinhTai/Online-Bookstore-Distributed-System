@@ -1,12 +1,12 @@
 import apiClientService from "@/common/components/services/ApiClientService";
 import { OrdersPostVm } from "../model/OrdersPostVm";
-import { OrderVm } from "../model/Order";
+import { Order } from "../model/Order";
 
 const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/order/storefront`;
 
-export async function createOrder(ordersPostVm: OrdersPostVm): Promise<{ status: number, data: OrderVm }> {
+export async function createOrder(ordersPostVm: OrdersPostVm): Promise<{ status: number, data: Order }> {
     const reponse = await apiClientService.post(`${baseUrl}/orders`, JSON.stringify(ordersPostVm));
-    const data: OrderVm = await reponse.json();
+    const data: Order = await reponse.json();
     if (!reponse.ok) {
         throw new Error("Không thể tạo đơn hàng");
     } else {
@@ -17,7 +17,7 @@ export async function createOrder(ordersPostVm: OrdersPostVm): Promise<{ status:
     }
 }
 
-export async function getOrderById(id: number): Promise<OrderVm> {
+export async function getOrderById(id: number): Promise<Order> {
     const reponse = await apiClientService.get(`${baseUrl}/orders/${id}`);
     if (!reponse.ok) {
         throw new Error("Có lỗi với đơn hàng")
@@ -27,7 +27,7 @@ export async function getOrderById(id: number): Promise<OrderVm> {
 
 }
 
-export async function getListOrderByCreatedBy(): Promise<OrderVm[]> {
+export async function getListOrderByCreatedBy(): Promise<Order[]> {
     const response = await apiClientService.get(`${baseUrl}/orders/listOrders`)
     if (!response.ok) {
         throw new Error("Có lỗi với đơn hàng");

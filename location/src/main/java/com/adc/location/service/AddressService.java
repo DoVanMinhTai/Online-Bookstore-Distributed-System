@@ -28,7 +28,9 @@ public class AddressService {
     public AddressGetVm createAddress(@Valid AddressPostVm dto) {
         Address address = AddressPostVm.fromModel(dto);
         stateOrProvinceRepository.findById(dto.stateOrProvinceId()).ifPresent(address::setStateOrProvince);
-        districtRepository.findById(dto.districtId()).ifPresent(address::setDistrict);
+        if (dto.districtId() != null) {
+            districtRepository.findById(dto.districtId()).ifPresent(address::setDistrict);
+        }
         Country country = countryRepository.findById(dto.countryId()).orElseThrow(
                 () -> new IllegalArgumentException("Country not found")
         );
@@ -47,7 +49,9 @@ public class AddressService {
         address.setCity(dto.city());
         address.setZipCode(dto.zipCode());
         stateOrProvinceRepository.findById(dto.stateOrProvinceId()).ifPresent(address::setStateOrProvince);
-        districtRepository.findById(dto.districtId()).ifPresent(address::setDistrict);
+        if (dto.districtId() != null) {
+            districtRepository.findById(dto.districtId()).ifPresent(address::setDistrict);
+        }
         countryRepository.findById(dto.countryId()).ifPresent(address::setCountry);
         addressRepository.save(address);
     }

@@ -1,24 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faInstagram } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faPhone, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import logo from '../../../assets/images/logo.webp'
 import Image from 'next/image';
 import CartModal from '@/modules/cart/components/CartModal';
 import AuthenticationInfo from '../AuthenticationInfo';
 import { useCartContext } from '@/context/CartContext';
+import CategoryDropdown from './CategoryDropdown';
 
 const Header = () => {
     const { numberCartItems } = useCartContext();
     const router = useRouter();
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const isActive = (path: string) => router.pathname === path;
 
     const navLinks = [
         { name: 'Trang chủ', href: '/' },
-        { name: 'Danh mục', href: '/categories' },
+        { name: 'Danh mục', href: '/categories', hasDropdown: true },
         { name: 'Giới thiệu', href: '/about' },
     ];
 
@@ -58,17 +60,27 @@ const Header = () => {
                     <nav className="hidden lg:block">
                         <ul className="flex items-center gap-8">
                             {navLinks.map((link) => (
-                                <li key={link.href}>
+                                <li
+                                    key={link.href}
+                                    className="relative py-2"
+                                    onMouseEnter={() => link.hasDropdown && setDropdownOpen(true)}
+                                    onMouseLeave={() => link.hasDropdown && setDropdownOpen(false)}
+                                >
                                     <Link
                                         href={link.href}
-                                        className={`text-[14px] font-bold uppercase tracking-wide transition-all hover:text-emerald-600 relative py-2 ${isActive(link.href) ? "text-emerald-600" : "text-slate-700"
-                                            }`}
+                                        className={`text-[14px] font-bold uppercase tracking-wide transition-all hover:text-emerald-600 flex items-center gap-1.5 ${
+                                            isActive(link.href) ? "text-emerald-600" : "text-slate-700"
+                                        }`}
                                     >
                                         {link.name}
+                                        {link.hasDropdown && (
+                                            <FontAwesomeIcon icon={faChevronDown} className="text-[10px] opacity-70" />
+                                        )}
                                         {isActive(link.href) && (
                                             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-600"></span>
                                         )}
                                     </Link>
+                                    {link.hasDropdown && dropdownOpen && <CategoryDropdown />}
                                 </li>
                             ))}
                         </ul>
@@ -95,4 +107,4 @@ const Header = () => {
     );
 };
 
-export default Header;
+export default Header;

@@ -21,4 +21,12 @@ INSERT INTO media (id, caption, file_name, file_path, media_type) VALUES
   (17, 'Bìa sách The Definitive Book of Body Language', 'the-definitive-book-of-body-language-allan-pease-barbara-pease.jpg', '/images/books/the-definitive-book-of-body-language-allan-pease-barbara-pease.jpg', 'image/jpeg'),
   (18, 'Bìa sách How to live 365 days a year', 'how-to-live-365-days-a-year-john-a-schindler.jpg', '/images/books/how-to-live-365-days-a-year-john-a-schindler.jpg', 'image/jpeg'),
   (19, 'Bìa sách Tell Me What to Eat to Help Prevent Breast Cancer', 'tell-me-what-to-eat-to-help-prevent-breast-cancer-elaine-magee.jpg', '/images/books/tell-me-what-to-eat-to-help-prevent-breast-cancer-elaine-magee.jpg', 'image/jpeg'),
-  (20, 'Bìa sách Detox Your Mind', 'detox-your-mind-jane-scrivner.jpg', '/images/books/detox-your-mind-jane-scrivner.jpg', 'image/jpeg');
+  (20, 'Bìa sách Detox Your Mind', 'detox-your-mind-jane-scrivner.jpg', '/images/books/detox-your-mind-jane-scrivner.jpg', 'image/jpeg')
+ON CONFLICT (id) DO UPDATE SET
+    caption = EXCLUDED.caption,
+    file_name = EXCLUDED.file_name,
+    file_path = EXCLUDED.file_path,
+    media_type = EXCLUDED.media_type;
+
+-- Keep the id sequence in sync with the explicitly inserted ids
+SELECT setval(pg_get_serial_sequence('media', 'id'), (SELECT MAX(id) FROM media));

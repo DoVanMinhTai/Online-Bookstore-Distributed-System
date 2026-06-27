@@ -9,8 +9,8 @@ import ConfimationDialog from '@/common/dialog/ConfirmationDialog';
 import { CartItem, calculateTotalPrice } from '@/modules/cart/components/CartItem';
 import { Checkout } from '@/modules/checkout/models/Checkout';
 import { useUserInfoContext } from '@/context/UserInforProvider';
-import { createCheckout } from '@/modules/checkout/service/CheckoutService';
 import { CheckoutType } from '@/modules/checkout/models/enum/CheckoutType';
+import { createCheckout } from '@/modules/checkout/services/CheckoutService';
 
 const Index = () => {
   const [cartItems, setCartItem] = useState<CartItemGetDetailVms[]>([]);

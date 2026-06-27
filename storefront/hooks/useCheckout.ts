@@ -1,6 +1,6 @@
 import { deleteCartItemByProductId } from "@/modules/cart/services/CartService";
 import { CheckoutType } from "@/modules/checkout/models/enum/CheckoutType";
-import { OrderItemVm } from "@/modules/orders/model/OrderItem";
+import { OrderItem } from "@/modules/orders/model/OrderItem";
 import { OrdersPostVm } from "@/modules/orders/model/OrdersPostVm";
 import { createOrder } from "@/modules/orders/services/OrdersService";
 import { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ export function useCheckout(fecthNumberCartItems: () => Promise<void>) {
         }
     }, []);
 
-    const executePostOrderStrategy = async (orderItem: OrderItemVm[]) => {
+    const executePostOrderStrategy = async (orderItem: OrderItem[]) => {
         if (type === CheckoutType.CART) {
             await Promise.all(orderItem.map((i) => deleteCartItemByProductId(i.productId)));
         }

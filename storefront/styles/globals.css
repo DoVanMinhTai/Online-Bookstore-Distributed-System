@@ -1,3 +1,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Swiper banner overrides ── */
+.banner-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 1;
+  width: 8px;
+  height: 8px;
+  transition: background 0.2s, width 0.2s;
+}
+.banner-swiper .swiper-pagination-bullet-active {
+  background: #10b981;
+  width: 20px;
+  border-radius: 4px;
+}
+.banner-swiper .swiper-button-next,
+.banner-swiper .swiper-button-prev {
+  color: white;
+  width: 36px;
+  height: 36px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+}
+.banner-swiper .swiper-button-next::after,
+.banner-swiper .swiper-button-prev::after {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}

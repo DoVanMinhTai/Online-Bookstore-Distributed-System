@@ -106,6 +106,7 @@ To route traffic properly through Nginx, you must map the local domains to your 
    127.0.0.1   api.local
    127.0.0.1   pgadmin.local
    127.0.0.1   identity.local
+   127.0.0.1   backoffice.local
    ```
 4. Save and close.
 

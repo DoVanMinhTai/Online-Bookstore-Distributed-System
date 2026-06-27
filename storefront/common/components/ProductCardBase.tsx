@@ -4,6 +4,8 @@ import ImageWithFallBack from './ImageWithFallBack';
 import Link from 'next/link';
 import { addToCartItem } from '@/modules/cart/services/CartService';
 import { useCartContext } from '@/context/CartContext';
+import toast from 'react-hot-toast';
+
 interface ProductCardBase {
     product: {
         id: number;
@@ -21,29 +23,38 @@ const ProductCardBase: React.FC<ProductCardBase> = ({ product, thumbnailUrl }) =
         try {
             await addToCartItem(payload);
             fetchNumberCartItems();
+            toast.success(`Đã thêm "${product.name}" vào giỏ hàng!`);
         } catch (error) {
             console.error('Error adding to cart:', error);
         }
     }
     return (
-        <>
-            <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
-                <div className="border rounded-lg p-4 shadow-md hover:shadow-lg">
-                    <Link href={`/products/${product.slug}`}>
+        <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
+            <div className="flex h-full flex-col justify-between border border-slate-100 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 group">
+                <Link href={`/products/${product.slug}`} className="flex flex-col flex-grow">
+                    <div className="relative overflow-hidden rounded-lg bg-slate-50 aspect-square flex items-center justify-center">
                         <ImageWithFallBack
                             src={thumbnailUrl}
-                            alt={product.name} />
-                        <h2 className="text-lg font-semibold mt-2">{product.name}</h2>
-                        <p className="text-gray-500">{formatPrice(product.price)}</p>
-                    </Link>
-                    <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none transition-colors" onClick={addToCart}>
-                        Thêm vào giỏ Hàng
-                    </button>
-                </div>
+                            alt={product.name}
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                    </div>
+                    <h2 className="text-sm font-bold text-slate-800 mt-3 line-clamp-2 group-hover:text-emerald-600 transition-colors flex-grow">
+                        {product.name}
+                    </h2>
+                    <p className="text-emerald-600 font-extrabold mt-1 text-sm">
+                        {formatPrice(product.price)}
+                    </p>
+                </Link>
+                <button 
+                    className="mt-3 w-full bg-emerald-600 text-white font-semibold text-xs py-2 px-3 rounded-lg hover:bg-emerald-500 active:bg-emerald-700 transition-colors focus:outline-none cursor-pointer" 
+                    onClick={addToCart}
+                >
+                    Thêm vào giỏ hàng
+                </button>
             </div>
-
-        </>
+        </div>
     )
 }
 
-export default ProductCardBase
+export default ProductCardBase

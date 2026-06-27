@@ -1,6 +1,6 @@
 import ImageWithFallBack from '@/common/components/ImageWithFallBack';
 import { getProductById } from '@/modules/catalog/services/ProductService';
-import { OrderVm } from '@/modules/orders/model/Order';
+import { Order } from '@/modules/orders/model/Order';
 import { getOrderById } from '@/modules/orders/services/OrdersService';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -15,7 +15,7 @@ const formatCurrency = (amount?: number) => {
 const OrderSuccessPage = () => {
     const router = useRouter();
     const { id } = router.query;
-    const [order, setOrder] = useState<OrderVm | undefined>();
+    const [order, setOrder] = useState<Order | undefined>();
     const [products, setProducts] = useState<ProductThumbnail[]>([]);
     const [loading, setLoading] = useState(true);
     const { fetchNumberCartItems } = useCartContext();

@@ -1,6 +1,7 @@
 package com.adc.product.controller;
 
 
+import com.adc.product.config.SearchIndexInitializer;
 import com.adc.product.model.Book;
 import com.adc.product.model.PaginatedItems;
 import com.adc.product.service.ProductService;
@@ -15,10 +16,19 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class BookController {
     private ProductService productService;
+    private final SearchIndexInitializer searchIndexInitializer;
 
-    public BookController(ProductService productService) {
+    public BookController(ProductService productService, SearchIndexInitializer searchIndexInitializer) {
         this.productService = productService;
+        this.searchIndexInitializer = searchIndexInitializer;
     }
+
+    @PostMapping("/storefront/product/reindex")
+    public ResponseEntity<String> reindex() throws InterruptedException {
+        searchIndexInitializer.reindex();
+        return ResponseEntity.ok("Reindex completed");
+    }
+
 
 
     @GetMapping("/storefront/product/getBooks")

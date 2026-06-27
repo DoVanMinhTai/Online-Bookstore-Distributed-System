@@ -15,7 +15,7 @@ public record AddressDetailVm(Long id,String contactName, String phone, String a
                 .addressLine2(address.getAddressLine2())
                 .city(address.getCity())
                 .zipCode(address.getZipCode())
-                .districtId(address.getDistrict().getId())
+                .districtId(address.getDistrict() != null ? address.getDistrict().getId() : null)
                 .stateOrProvinceId(address.getStateOrProvince().getId())
                 .countryId(address.getCountry().getId())
                 .build();

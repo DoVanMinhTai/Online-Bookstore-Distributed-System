@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
-import { ProductDetail } from '../model/ProductDetail';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import ImageWithFallBack from '@/common/components/ImageWithFallBack';
-import { ProductImageGarelly } from '@/common/components/ProductImageGarelly';
 import ProductInfo from './details/ProductInfo';
 import ProductActions from './actions/ProductActions';
 import ProductTabs from './tabs/ProductTabs';
 import ProductSimilar from './similar/ProductSimilar';
-import { addToCartItem } from '@/modules/cart/services/CartServices';
+import { ProductDetail } from '../model/ProductDetail';
+import { ProductImageGarelly } from '@/common/components/ProductImageGarelly';
 import { useCartContext } from '@/context/CartContext';
-import { createCheckout } from '@/modules/checkout/service/CheckoutService';
 import { useUserInfoContext } from '@/context/UserInforProvider';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Checkout } from '@/modules/checkout/model/Checkout';
-import { CheckoutType } from '@/modules/checkout/model/enum/CheckoutType';
+import { addToCartItem } from '@/modules/cart/services/CartService';
+import { CheckoutType } from '@/modules/checkout/models/enum/CheckoutType';
+import { Checkout } from '@/modules/checkout/models/Checkout';
+import { createCheckout } from '@/modules/checkout/services/CheckoutService';
 
 type ProductDetailProps = {
     product: ProductDetail;

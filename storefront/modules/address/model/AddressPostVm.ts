@@ -5,7 +5,7 @@ export type AddressPostVm = {
      addressLine2?: string;
      city?: string;
      zipCode?: string;
-     districtId: number;
+     districtId?: number;
      stateOrProvinceId: number;
      countryId: number;
 }

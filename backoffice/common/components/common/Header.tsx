@@ -1,90 +1,88 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image';
+import { useRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faInstagram, faPinterest } from '@fortawesome/free-brands-svg-icons';
+import { faFacebook, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
+import logo from '../../../assets/images/logo.webp'
+import Image from 'next/image';
 import AuthenticationInfo from '../AuthenticationInfo';
 
 const Header = () => {
-    return (
-        <header >
-            {/* Header Top */}
-            <div className="header-wrapper">
-                <div className="header-top bg-[#161519] text-white flex">
-                    <div className="container mx-auto flex  justify-between items-center ">
-                        <div className="flex  items-center justify-center h-full p-1">
-                            <ul className="p-0 m-0 gap-3 flex items-center justify-center text-sm h-full ">
-                                <li className="">Đặt bánh lấy ngay tại Thành phố Hồ Chí Minh</li>
-                                <li className="">Hệ thống sách chính hãng</li>
-                                <li className="">Hotline: 01234576789</li>
-                            </ul>
-                        </div>
-                        <div className="flex hide-for-medium flex-right">
-                            <ul className="nav top-bar-nav nav-right nav-small nav-divided">
-                                <li className="html header-social-icons">
-                                    <div className="social-icons follow-icons flex gap-3">
-                                        <a href="#">
-                                            <FontAwesomeIcon icon={faFacebook}></FontAwesomeIcon>
-                                        </a>
-                                        <a href="#">
-                                            <FontAwesomeIcon icon={faInstagram}></FontAwesomeIcon>
-                                        </a>
-                                        <a href="#">
-                                            <FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon>
-                                        </a>
+    const router = useRouter();
 
-                                        <a href="#">
-                                            <FontAwesomeIcon icon={faPhone}></FontAwesomeIcon>
-                                        </a>
-                                        <a href="#">
-                                            <FontAwesomeIcon icon={faPinterest}></FontAwesomeIcon>
-                                        </a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+    const isActive = (path: string) => router.pathname === path;
+
+    const navLinks = [
+        { name: 'Trang chủ', href: '/' },
+        { name: 'Danh mục', href: '/categories' },
+        { name: 'Giới thiệu', href: '/about' },
+    ];
+
+    return (
+        <header className="w-full bg-white shadow-sm">
+            {/* Header Top */}
+            <div className="bg-[#161519] text-white py-2">
+                <div className="container mx-auto px-4 flex justify-between items-center">
+                    <div className="hidden md:flex items-center gap-6 text-[12px] font-medium opacity-90">
+                        <span>Hệ thống quản lý Bookstore</span>
+                        <span className="w-px h-3 bg-gray-600"></span>
+                        <span>Hotline kỹ thuật: 01234576789</span>
+                        <span className="w-px h-3 bg-gray-600"></span>
+                        <span>Hệ thống sách chính hãng</span>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-sm">
+                        <a href="#" className="hover:text-blue-400 transition-colors"><FontAwesomeIcon icon={faFacebook} /></a>
+                        <a href="#" className="hover:text-pink-400 transition-colors"><FontAwesomeIcon icon={faInstagram} /></a>
+                        <a href="#" className="hover:text-red-400 transition-colors"><FontAwesomeIcon icon={faEnvelope} /></a>
+                        <a href="#" className="hover:text-emerald-400 transition-colors"><FontAwesomeIcon icon={faPhone} /></a>
                     </div>
                 </div>
             </div>
 
             {/* Header Center */}
-            <div className="w-full my-1 mx-auto container">
-                <div className="container w-full">
-                    <div className="flex p-0 m-0 w-full  gap-3">
-                        <div className="p-0 m-0 rounded-lg border-gray-500 border-3">
-                            <Link href="/">
-                                {/* <Image src={logo} alt='logo image' width={100} height={100} /> */}
-                            </Link>
-                        </div>
-                        <div className="flex grow justify-between">
-                            <ul className="flex h-full items-center space-x-6 p-0 ">
-                                <li>
-                                    <a href="" className="active no-underline">Trang chủ</a>
+            <div className="container mx-auto flex justify-between px-4 py-3">
+                <div className="flex items-center gap-8">
+                    <Link href="/" className="flex-shrink-0 transition-transform hover:scale-105">
+                        <Image
+                            src={logo}
+                            alt="Logo"
+                            width={80}
+                            height={80}
+                            className="object-contain"
+                        />
+                    </Link>
+
+                    <nav className="hidden lg:block">
+                        <ul className="flex items-center gap-8">
+                            {navLinks.map((link) => (
+                                <li key={link.href} className="relative py-2">
+                                    <Link
+                                        href={link.href}
+                                        className={`text-[14px] font-bold uppercase tracking-wide transition-all hover:text-indigo-600 relative py-2 ${
+                                            isActive(link.href) ? "text-indigo-600" : "text-slate-700"
+                                        }`}
+                                    >
+                                        {link.name}
+                                        {isActive(link.href) && (
+                                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"></span>
+                                        )}
+                                    </Link>
                                 </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </div>
 
-                                <li className="relative group">
-                                    <a href="" className='no-underline'>Danh mục</a>
-
-                                </li>
-
-                                <li>
-                                    <a className='no-underline' href="">Giới thiệu</a>
-                                </li>
-                            </ul>
-
-
-                            {/* Cart & Account */}
-                            <div className="flex gap-4">
-                                <div className="flex items-center gap-2">
-                                    <AuthenticationInfo />
-                                </div>
-                            </div>
-                        </div>
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center">
+                        <AuthenticationInfo />
                     </div>
                 </div>
             </div>
         </header>
     );
 };
-export default Header
+
+export default Header;

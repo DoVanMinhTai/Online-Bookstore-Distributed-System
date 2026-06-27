@@ -20,11 +20,11 @@ type Props = {
 }
 
 const sidebarItems = [
-    { name: 'Tổng quan', href: '/admin', icon: LayoutDashboard },
-    { name: 'Sản phẩm', href: '/admin/products', icon: Package },
-    { name: 'Đơn hàng', href: '/admin/orders', icon: ShoppingCart },
-    { name: 'Khách hàng', href: '/admin/users', icon: Users },
-    { name: 'Cài đặt', href: '/admin/settings', icon: Settings },
+    { name: 'Tổng quan',     href: '/admin',          icon: LayoutDashboard },
+    { name: 'Sản phẩm',     href: '/admin/products', icon: Package },
+    { name: 'Đơn hàng',     href: '/admin/orders',   icon: ShoppingCart },
+    { name: 'Khách hàng',   href: '/admin/users',    icon: Users },
+    { name: 'Cài đặt',      href: '/admin/settings', icon: Settings },
 ];
 
 export default function DashboardLayout({ children, title = "Admin Dashboard" }: Props) {

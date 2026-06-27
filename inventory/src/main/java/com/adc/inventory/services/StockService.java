@@ -11,6 +11,9 @@ import com.adc.inventory.repository.WareHouseRepository;
 import com.adc.inventory.viewmodel.product.ProductQuantityPostVm;
 import com.adc.inventory.viewmodel.stock.*;
 import com.adc.inventory.viewmodel.product.ProductInfo;
+import com.adc.inventory.lock.DistributedLock;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class StockService {
     private final WareHouseService wareHouseService;
     private final StockHistoryService stockHistoryService;
     private final StockHistoryRepository stockHistoryRepository;
+    private final RedissonClient redissonClient;
 
     public void addProductIntoWareHouse(List<StockPostVm> postVms) {
         List<Stock> stocks = postVms.stream().map(postVm -> {
@@ -111,33 +115,51 @@ public class StockService {
     @Transactional
     public void reduceStock(List<StockDeleteVm> stockDeleteVms) {
         for (StockDeleteVm vm : stockDeleteVms) {
-            Stock stock = stockRepository.findByProductIdAndWarehouseIdWithLock(vm.productId(), vm.warehouseId()).orElseThrow(
-                    () -> new NotFoundException("STOCK_NOT_FOUND")
-            );
+            String lockKey = "product:" + vm.productId();
+            RLock lock = redissonClient.getLock(lockKey);
+            boolean isLocked = false;
+            try {
+                isLocked = lock.tryLock(5, 10, java.util.concurrent.TimeUnit.SECONDS);
+                if (!isLocked) {
+                    throw new RuntimeException("Could not acquire lock for product: " + vm.productId());
+                }
 
-            if (stock.getQuantity() < vm.quantity()) {
-                throw new RuntimeException("OUT_OF_STOCK");
+                Stock stock = stockRepository.findByProductIdAndWarehouseIdWithLock(vm.productId(), vm.warehouseId()).orElseThrow(
+                        () -> new NotFoundException("STOCK_NOT_FOUND")
+                );
+
+                if (stock.getQuantity() < vm.quantity()) {
+                    throw new RuntimeException("OUT_OF_STOCK");
+                }
+
+                if (stock.getReversedQuantity() < vm.quantity()) {
+                    stock.setReversedQuantity(0L);
+                } else {
+                    stock.setReversedQuantity(stock.getReversedQuantity() - vm.quantity());
+                }
+
+                stock.setQuantity(stock.getQuantity() - vm.quantity());
+
+                StockHistory history = StockHistory.builder()
+                        .productId(vm.productId())
+                        .wareHouse(stock.getWareHouse())
+                        .adjustedQuantity((long) -vm.quantity())
+                        .note("Xuất kho")
+                        .build();
+
+                stockHistoryRepository.save(history);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Lock interrupted", e);
+            } finally {
+                if (isLocked && lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
-
-            if (stock.getReversedQuantity() < vm.quantity()) {
-                stock.setReversedQuantity(0L);
-            } else {
-                stock.setReversedQuantity(stock.getReversedQuantity() - vm.quantity());
-            }
-
-            stock.setQuantity(stock.getQuantity() - vm.quantity());
-
-            StockHistory history = StockHistory.builder()
-                    .productId(vm.productId())
-                    .wareHouse(stock.getWareHouse())
-                    .adjustedQuantity((long) -vm.quantity())
-                    .note("Xuất kho")
-                    .build();
-
-            stockHistoryRepository.save(history);
         }
     }
 
+    @DistributedLock(key = "'product:' + #productId", waitTime = 5, leaseTime = 10)
     @Transactional
     public void reserveStock(Long productId, Long warehouseId, Long quantity) {
 //      Default WarehouseId = 1L;
@@ -153,6 +175,7 @@ public class StockService {
         stockRepository.save(stock);
     }
 
+    @DistributedLock(key = "'product:' + #productId", waitTime = 5, leaseTime = 10)
     @Transactional
     public void releaseStock(Long productId, Long warehouseId, Long quantity) {
         Stock stock = stockRepository.findByProductIdAndWarehouseIdWithLock(productId, warehouseId).orElseThrow();

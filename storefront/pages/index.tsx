@@ -1,20 +1,28 @@
-import { Banner } from "@/modules/homepage/components";
-import BestSellerList from "@/modules/homepage/components/BestSellerList";
-import FeturedProduct from "@/modules/homepage/components/FeturedProduct";
-import BreadCrumb from "@/common/components/BreadCrumb";
+import {
+  Banner,
+  BestSellerList,
+  FeturedProduct,
+  FeaturedCategories,
+  NewsletterSection,
+} from "@/modules/homepage/components";
 
 export default function Home() {
   return (
     <>
-      <BreadCrumb
-        items={[
-          { pageName: "Home", url: "/" },
-        ]}
-        className=""
-      />
+      {/* Hero banner + promo cards */}
       <Banner />
+
+      {/* Danh mục nổi bật */}
+      <FeaturedCategories />
+
+      {/* Sản phẩm bán chạy */}
       <BestSellerList />
+
+      {/* Sản phẩm nổi bật */}
       <FeturedProduct />
+
+      {/* Newsletter */}
+      <NewsletterSection />
     </>
   );
 }

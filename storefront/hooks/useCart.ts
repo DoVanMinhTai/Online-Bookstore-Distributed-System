@@ -1,5 +1,5 @@
 import { useCartContext } from "@/context/CartContext";
-import { addToCartItem } from "../services/CartServices";
+import { addToCartItem } from "@/modules/cart/services/CartService";
 import { useState } from "react";
 
 export function useCart() {

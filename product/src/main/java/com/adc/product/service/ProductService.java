@@ -5,8 +5,12 @@ import com.adc.product.model.*;
 import com.adc.product.respository.*;
 
 import com.adc.product.viewmodel.*;
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +19,8 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 
 @Service
 @AllArgsConstructor
@@ -23,6 +29,7 @@ public class ProductService {
     private final BrandRepository brandRepository;
     private final OrderService orderService;
     private final MediaService mediaService;
+    private final EntityManager entityManager;
 
 
     public PaginatedItems<Book> getBooks(int pageIndex, int pageSize) {
@@ -33,9 +40,24 @@ public class ProductService {
     }
 
     public PaginatedItems<Book> searchBooksByWord(String word, int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex, pageSize);
-        Page<Book> bookPage = bookRepository.searchBookByWord(word, pageable);
-        return new PaginatedItems<>(pageIndex, pageSize, bookPage.getTotalElements(), bookPage.getContent());
+        // Empty query: fall back to a plain paginated listing.
+        if (word == null || word.isBlank()) {
+            return getBooks(pageIndex, pageSize);
+        }
+
+        SearchSession searchSession = Search.session(entityManager);
+        int offset = pageIndex * pageSize;
+
+        SearchResult<Book> result = searchSession.search(Book.class)
+                .where(f -> f.simpleQueryString()
+                        .fields("name", "title", "titleWithoutSeries", "authorName",
+                                "shortDescription", "description")
+                        .matching(word + "*")
+                        .defaultOperator(org.hibernate.search.engine.search.common.BooleanOperator.AND))
+                .fetch(offset, pageSize);
+
+        long totalHits = result.total().hitCount();
+        return new PaginatedItems<>(pageIndex, pageSize, totalHits, result.hits());
     }
 
     public BookListGetVM getBooksWithFilter(int pageNo, int pageSize, String bookName, String brand) {
@@ -84,18 +106,15 @@ public class ProductService {
     public List<ProductThumbnailGetVm> getProductBestSelling() {
         List<Long> productIds = orderService.getProductByIdAndCompleted();
         List<Book> result = bookRepository.findAllById(productIds);
+        Map<Long, String> thumbnailUrls = getThumbnailUrlMap(result);
         return result.stream().map(
-                product -> {
-                    String thumbnail = mediaService.getMedia(product.getThumbnailMediaId()).url();
-                    return new ProductThumbnailGetVm(
-                            product.getId(),
-                            product.getName(),
-                            product.getSlug(),
-                            thumbnail,
-                            product.getPrice()
-                    );
-
-                }
+                product -> new ProductThumbnailGetVm(
+                        product.getId(),
+                        product.getName(),
+                        product.getSlug(),
+                        thumbnailUrls.get(product.getThumbnailMediaId()),
+                        product.getPrice()
+                )
         ).toList();
     }
 
@@ -104,11 +123,12 @@ public class ProductService {
         List<ProductThumbnailGetVm> productThumbnailGetVms = new ArrayList<>();
         Page<Book> productPage = bookRepository.getFeaturedProducts(pageable);
         List<Book> productList = productPage.getContent();
+        Map<Long, String> thumbnailUrls = getThumbnailUrlMap(productList);
         for (Book book : productList) {
             productThumbnailGetVms.add(
                     new ProductThumbnailGetVm(
                             book.getId(), book.getName(), book.getSlug()
-                            , mediaService.getMedia(book.getThumbnailMediaId()).url(), book.getPrice()
+                            , thumbnailUrls.get(book.getThumbnailMediaId()), book.getPrice()
                     )
             );
         }
@@ -116,17 +136,26 @@ public class ProductService {
 
     }
 
+
     public ProductDetailGetVm getProductDetail(String slug) {
         Book product = bookRepository.findBySlugAndIsPublishedTrue(slug).orElseThrow(
                 () -> new NotFoundException("Product Not Found", slug)
         );
-        String thumbnailMediaUrl = mediaService.getMedia(product.getThumbnailMediaId()).url();
+        List<Long> mediaIds = new ArrayList<>();
+        mediaIds.add(product.getThumbnailMediaId());
+        if (CollectionUtils.isNotEmpty(product.getBookImages())) {
+            product.getBookImages().forEach(image -> mediaIds.add(image.getImageId()));
+        }
+        Map<Long, String> mediaUrls = mediaService.getMediaUrlMap(mediaIds);
+
+        String thumbnailMediaUrl = mediaUrls.get(product.getThumbnailMediaId());
         List<String> productImageMediaUrl = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(product.getBookImages())) {
             for (BookImage image : product.getBookImages()) {
-                productImageMediaUrl.add(mediaService.getMedia(image.getImageId()).url());
+                productImageMediaUrl.add(mediaUrls.get(image.getImageId()));
             }
         }
+
 
         if (product.getBrand() == null) {
             product.setBrand(new Brand());
@@ -166,17 +195,19 @@ public class ProductService {
 
     public List<ProductThumbnailGetVm> getProductByIds(@Valid List<Long> productIds) {
         List<Book> books = bookRepository.findAllById(productIds);
+        Map<Long, String> thumbnailUrls = getThumbnailUrlMap(books);
 
         return books.stream().map(
                 product -> new ProductThumbnailGetVm(
                         product.getId(),
                         product.getName(),
                         product.getSlug(),
-                        getThumbnailUrl(product.getThumbnailMediaId()),
+                        thumbnailUrls.get(product.getThumbnailMediaId()),
                         product.getPrice()
                 )
         ).toList();
     }
+
 
     public ProductThumbnailGetVm getProductById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow();
@@ -196,12 +227,13 @@ public class ProductService {
         );
 
         List<Book> books = bookRepository.findAllByIdAndBrand_Id(book.getId(), book.getBrand().getId());
+        Map<Long, String> thumbnailUrls = getThumbnailUrlMap(books);
 
         return books.stream().map(product ->
                 new ProductThumbnailGetVm(product.getId()
                         , product.getName()
                         , product.getSlug()
-                        , getThumbnailUrl(product.getThumbnailMediaId())
+                        , thumbnailUrls.get(product.getThumbnailMediaId())
                         , product.getPrice()
                 )).toList();
     }
@@ -213,4 +245,21 @@ public class ProductService {
     public String getThumbnailUrl(Long mediaId) {
         return mediaService.getMedia(mediaId).url();
     }
+
+    /**
+     * Builds a map of thumbnailMediaId -> url for a list of books using a single
+     * batch call to the media service, avoiding N+1 inter-service requests.
+     */
+    private Map<Long, String> getThumbnailUrlMap(List<Book> books) {
+        if (CollectionUtils.isEmpty(books)) {
+            return Map.of();
+        }
+        List<Long> mediaIds = books.stream()
+                .map(Book::getThumbnailMediaId)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        return mediaService.getMediaUrlMap(mediaIds);
+    }
 }
+
+

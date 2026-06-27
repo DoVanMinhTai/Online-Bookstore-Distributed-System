@@ -1,7 +1,7 @@
 import AddressForm from '@/modules/address/components/AddressForm'
-import { Address } from '@/modules/address/model/AddressGetVm'
+import { AddressGetVm } from '@/modules/address/model/AddressGetVm'
 import { AddressPostVm } from '@/modules/address/model/AddressPostVm'
-import { getAddressById, updateAddress } from '@/modules/address/service/Address'
+import { getAddressById, updateUserAddress } from '@/modules/address/service/Address'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -16,19 +16,19 @@ const Edit: NextPage = () => {
         setValue,
         handleSubmit: handleSubmitUpdateAddress,
         formState: { errors }
-    } = useForm<Address>();
+    } = useForm<AddressGetVm>();
 
-    const [address, setAddress] = useState<Address>();
+    const [address, setAddress] = useState<AddressGetVm>();
     const [isDisplayModalUpdateAddress, setIsDisplayModalUpdateAddress] = useState<boolean>(false)
 
     useEffect(() => {
         const idNumber = Number(id);
-        getAddressById(idNumber).then((res : Address) => {
+        getAddressById(idNumber).then((res: AddressGetVm) => {
             setAddress(res);
         })
     }, [id]);
 
-    const onSubmitUpdateAddress: SubmitHandler<Address> = async (data) => {
+    const onSubmitUpdateAddress: SubmitHandler<AddressGetVm> = async (data) => {
         const addressUpdate: AddressPostVm = {
             contactName: data.contactName,
             phone: 'data',
@@ -42,7 +42,7 @@ const Edit: NextPage = () => {
         }
 
         if (id) {
-            const response = await updateAddress(Number(id), addressUpdate);
+            const response = await updateUserAddress(Number(id), addressUpdate);
             if (response.status === 204) {
                 /*
                     - Create Components Toast 

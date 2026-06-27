@@ -13,7 +13,7 @@ public record AddressPostVm(@Size(max = 450) String contactName,
                             @Size(max = 450) String addressLine2,
                             @Size(max = 450) String city,
                             @Size(max = 25) String zipCode,
-                            @NotNull Long districtId,
+                            Long districtId,
                             @NotNull Long stateOrProvinceId,
                             @NotNull Long countryId,
                             AddressType addressType

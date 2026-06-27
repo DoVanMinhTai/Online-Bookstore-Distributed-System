@@ -23,6 +23,9 @@ public class DataSourceConfig {
     @Value("${spring.datasource.stock.url}")
     String urlStock;
 
+    @Value("${spring.datasource.location.url}")
+    String urlLocation;
+
     @Value("${spring.datasource.username}")
     String username;
 
@@ -48,6 +51,11 @@ public class DataSourceConfig {
         return DataSourceBuilder.create().driverClassName(driverClassName).url(urlStock).username(username).password(password).build();
     }
 
+    @Bean(name = "dataSourceLocation")
+    public DataSource dataSourceLocation() {
+        return DataSourceBuilder.create().driverClassName(driverClassName).url(urlLocation).username(username).password(password).build();
+    }
+
     @Bean(name = "jdbcProduct")
     @Primary
     public JdbcTemplate jdbcTemplateProduct(DataSource dataSourceProduct) {
@@ -62,5 +70,10 @@ public class DataSourceConfig {
     @Bean(name = "jdbcStock")
     public JdbcTemplate jdbcTemplateStock(DataSource dataSourceStock) {
         return new JdbcTemplate(dataSourceStock);
+    }
+
+    @Bean(name = "jdbcLocation")
+    public JdbcTemplate jdbcTemplateLocation(DataSource dataSourceLocation) {
+        return new JdbcTemplate(dataSourceLocation);
     }
 }

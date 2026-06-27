@@ -6,7 +6,7 @@ export type AddressGetVm = {
     addressLine2?: string;
     city?: string;
     zipCode?: string;
-    districtId: number;
+    districtId?: number;
     districtName?: string;
     stateOrProvinceId: number;
     stateOrProvinceName?: string;

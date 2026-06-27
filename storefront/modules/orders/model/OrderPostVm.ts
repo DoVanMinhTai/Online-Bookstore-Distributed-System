@@ -5,8 +5,8 @@ export type OrderPostVm = {
     addressLine2: string;
     city: string;
     zipCode: string;
-    districtId: number;
-    districtName: string;
+    districtId?: number;
+    districtName?: string;
     stateOrProvinceId: number;
     stateOrProvinceName: string;
     countryId: number;

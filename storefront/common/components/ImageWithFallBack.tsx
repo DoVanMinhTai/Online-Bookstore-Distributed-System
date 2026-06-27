@@ -36,8 +36,11 @@ const ImageWithFallBack = ({
                 className={clsx(className)}
                 alt={alt}
                 src={srcImg}
+                loading="lazy"
+                decoding="async"
                 {...props}
                 onError={() => {
+
                     if (srcImg !== customFallBack) {
                         setSrcImg(customFallBack);
                     }

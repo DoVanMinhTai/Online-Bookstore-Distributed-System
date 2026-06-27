@@ -10,6 +10,9 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Objects;
 
 @Slf4j
 public class SQLExecuteScript {
@@ -20,8 +23,13 @@ public class SQLExecuteScript {
     public void executeScriptForSchema(DataSource dataSource, String schema, String pathPattern) throws IOException, SQLException {
         Resource[] resources = resourcePatternResolver.getResources(pathPattern);
 
+        // Execute scripts in a deterministic order (by file name) so that
+        // scripts with FK dependencies run after their referenced data.
+        Arrays.sort(resources, Comparator.comparing(
+                r -> Objects.requireNonNullElse(r.getFilename(), "")));
+
         for (Resource resource : resources) {
-            executeSQLScript(dataSource,schema,resource);
+            executeSQLScript(dataSource, schema, resource);
         }
     }
 

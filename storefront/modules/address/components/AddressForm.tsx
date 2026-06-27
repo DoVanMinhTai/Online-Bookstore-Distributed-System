@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { AddressGetVm } from '../model/AddressGetVm'
 import { FieldErrorsImpl, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { CountryVm } from '@/modules/country/model/CountryVm';
 import { StateOrProvince } from '@/modules/stateorprovince/model/StateOrProvince';
-import { Districts } from '@/modules/districts/model/Districts';
 import { Input } from '@/common/Input';
 import { OptionSelect } from '@/common/OptionSelect';
-import { getAllCountries, getStateOrProvinces, getDistricts } from '@/modules/country/service/CountryService';
+import { getAllCountries, getStateOrProvinces } from '@/modules/country/service/CountryService';
 import ModalHeadersProps from './ModalHeadersProps';
+import { AddressGetVm } from '../model/AddressGetVm';
 
 type AddressFormProps = {
   handleSubmit: () => void;
@@ -34,7 +33,6 @@ export default function AddressForm({
 }: AddressFormProps) {
   const [countries, setCountries] = useState<CountryVm[]>([]);
   const [stateOrProvinces, setStateOrProvinces] = useState<StateOrProvince[]>();
-  const [districts, setDistricts] = useState<Districts[]>([]);
 
   useEffect(() => {
     getAllCountries().then((res) => {
@@ -42,16 +40,28 @@ export default function AddressForm({
     });
   }, []);
 
+  // When creating a new address (no `address` prop), auto-select the first
+  // country and load its states once the country <option>s have been rendered.
+  // This must run after `countries` is set so the native <select> can reflect
+  // the value chosen via setValue and the "Tỉnh / Thành phố" dropdown gets data.
+  useEffect(() => {
+    if (!address && countries.length > 0) {
+      const defaultCountry = countries[0];
+      setValue('countryId', defaultCountry.id);
+      setValue('countryName', defaultCountry.name);
+      getStateOrProvinces(defaultCountry.id).then(setStateOrProvinces);
+    }
+  }, [countries, address, setValue]);
+
   useEffect(() => {
     if (address) {
-      getStateOrProvinces(address.stateOrProvinceId).then((data) => {
+      getStateOrProvinces(address.countryId).then((data) => {
         setStateOrProvinces(data);
-      });
-      getDistricts(address.districtId).then((data) => {
-        setDistricts(data);
       });
     }
   }, [address]);
+
+
 
   const onCountryChange = async (event: any) => {
     setValue('countryName', event.target.selectedOptions[0].text);
@@ -60,7 +70,6 @@ export default function AddressForm({
 
   const onStateOrProvinceChange = async (event: any) => {
     setValue('stateOrProvinceName', event.target.selectedOptions[0].text);
-    getDistricts(event.target.value).then(setDistricts);
   };
 
   return (
@@ -116,7 +125,7 @@ export default function AddressForm({
               />
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <OptionSelect
                 labelText="Quốc gia"
                 field="countryId"
@@ -140,19 +149,6 @@ export default function AddressForm({
                 registerOptions={{
                   required: { value: true, message: 'Please select state or province' },
                   onChange: onStateOrProvinceChange,
-                }}
-              />
-              <OptionSelect
-                labelText="Quận / Huyện"
-                register={register}
-                field="districtId"
-                options={districts}
-                placeholder="Chọn quận / huyện"
-                defaultValue={address?.districtId}
-                registerOptions={{
-                  required: { value: true, message: 'Please select district' },
-                  onChange: (event: any) =>
-                    setValue('districtName', event.target.selectedOptions[0].text),
                 }}
               />
             </div>

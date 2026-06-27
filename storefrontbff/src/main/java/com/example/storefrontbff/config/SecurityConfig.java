@@ -43,24 +43,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        return http
-                .authorizeExchange(auth -> auth
+        return http.authorizeExchange(auth -> auth
                         .pathMatchers("/profile/**").authenticated()
-                        .pathMatchers("/address/**").authenticated()
-                        .anyExchange().permitAll())
-                .oauth2Login(Customizer.withDefaults())
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                        .pathMatchers("/address/**").authenticated().anyExchange().permitAll())
+                .oauth2Login(Customizer.withDefaults()).httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .logout(logout -> logout
-                        .logoutSuccessHandler(oidcLogoutSuccessHandler())
-                )
-                .build();
+                .logout(logout -> logout.logoutSuccessHandler(oidcLogoutSuccessHandler())).build();
     }
 
     private ServerLogoutSuccessHandler oidcLogoutSuccessHandler() {
-        OidcClientInitiatedServerLogoutSuccessHandler oidcLogoutSuccessHandler =
-                new OidcClientInitiatedServerLogoutSuccessHandler(this.clientRegistrationRepository);
+        OidcClientInitiatedServerLogoutSuccessHandler oidcLogoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(this.clientRegistrationRepository);
         oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
 
         return oidcLogoutSuccessHandler;
@@ -73,13 +66,11 @@ public class SecurityConfig {
             Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
 
             if (authorities.isEmpty()) {
-                logger.warn("Không tìm thấy authority nào!");
                 return mappedAuthorities;
             }
 
             var authority = authorities.iterator().next();
             boolean isOidc = authority instanceof OidcUserAuthority;
-            logger.info("Đang xử lý authority: {}", authority.getAuthority());
 
             if (isOidc) {
                 var oidcUserAuthority = (OidcUserAuthority) authority;
@@ -127,11 +118,8 @@ public class SecurityConfig {
     }
 
 
-
     Collection<GrantedAuthority> generateAuthoritiesFromClaim(Collection<String> roles) {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toList());
+        return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList());
     }
 
 }

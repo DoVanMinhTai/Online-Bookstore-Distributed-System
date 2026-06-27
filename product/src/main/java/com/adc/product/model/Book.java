@@ -3,6 +3,8 @@ package com.adc.product.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Table(name = "book")
 @Entity
+@Indexed
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,11 +24,15 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @FullTextField(analyzer = "vietnamese")
     private String name;
 
+    @FullTextField(analyzer = "vietnamese")
     private String shortDescription;
 
+    @FullTextField(analyzer = "vietnamese")
     private String description;
+
 
     private String specification;
 
@@ -47,8 +54,10 @@ public class Book {
 
     private Long ratingsCount;
 
+    @FullTextField(analyzer = "vietnamese")
     private String title;
 
+    @FullTextField(analyzer = "vietnamese")
     private String titleWithoutSeries;
 
     private Double price;
@@ -61,6 +70,7 @@ public class Book {
 
     private Double itemWeight;
 
+    @FullTextField(analyzer = "vietnamese")
     private String authorName;
 
     private Long thumbnailMediaId;
